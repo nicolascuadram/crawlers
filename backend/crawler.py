@@ -3,6 +3,7 @@ import psycopg2
 from psycopg2 import sql
 from dotenv import load_dotenv
 from scraping.arxiv import Scrape_arxiv
+from scraping.devto import Scrape_dev_to
 
 # Cargar las variables de entorno
 load_dotenv()
@@ -87,6 +88,8 @@ def save_posts(conn, posts, log_id):
 def scrape_source(source_name, source_url):
     if source_name.lower() == 'arxiv cs':
         return Scrape_arxiv(source_url)
+    if source_name.lower() == 'dev to':
+        return Scrape_dev_to(source_url)
     else:
         print(f"No hay scraper configurado para {source_name}")
         return []
