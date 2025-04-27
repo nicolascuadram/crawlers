@@ -1,0 +1,83 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
+---
+
+<!doctype html>
+<html lang="es">
+	<head>
+		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+	</head>
+	<body>
+		<Header />
+		<main>
+			<div class="hero">
+				<h1>El sitio web de noticias sobre informática</h1>
+				<h5>Dev News unifica las novedades en tecnología de diversas fuentes en un solo lugar!</h5>
+				<button class="access-button">
+					<a href="/blog">Ver artículos</a>
+				</button>
+			</div>
+			<p>
+				Bienvenido a <strong>Dev News</strong>, un blog de tecnología y programación donde compartimos noticias, tutoriales y recursos
+				para desarrolladores. Aquí encontrarás contenido sobre lenguajes de programación, frameworks, herramientas y
+				tendencias en el mundo del desarrollo de software. Nuestro objetivo es mantenerte informado y ayudarte a
+				mejorar tus habilidades como programador. ¡Explora nuestro blog y descubre todo lo que tenemos para ofrecerte!
+			</p>
+			<p>
+				Esta página recopila los últimos artículos de diversas fuentes de noticias y blogs de tecnología. Puedes
+				navegar por las categorías y etiquetas para encontrar contenido que te interese. ¡Gracias por visitar
+				Dev News!
+			</p>
+			<p>Éstas son algunas de las fuentes que utilizamos:</p>
+			<ul>
+				<li>Placeholder source <a href="https://github.com/urzuaf">GitHub de Fernando Urzúa</a></li>
+				<li>Placeholder source <a href="https://github.com/nicolascuadram">GitHub de Nicolás Cuadra</a></li>
+				<li>Placeholder source <a href="https://github.com/CristianF3">GitHub de Cristian Fuentes</a></li>
+				<li>Placeholder source <a href="https://github.com/Nicolais174">GitHub de Nicolás López</a></li>
+				<li>Placeholder source <a href="https://github.com/maxxandres">GitHub de Maximiliano Maure</a></li>
+			</ul>
+		</main>
+		<Footer />
+	</body>
+</html>
+
+<style>
+	.hero {
+		width: calc(100% - 2em);
+		max-width: 100%;
+		margin: 2em 0;
+		padding: 1em;
+		text-align: center;
+	}
+	.hero h1 {
+		line-height: 1;
+	}
+	.hero h5 {
+		margin: 0;
+		font-size: 1.2em;
+		font-weight: 400;
+		padding-left: 14%;
+		padding-right: 14%; 
+		color: gray;
+	}
+	.access-button {
+		margin: 4em auto;
+		padding: 1.2em 3em;
+		background-color: var(--accent);
+		border: none;
+		border-radius: 24px;
+		cursor: pointer;
+	}
+	.access-button a {
+		text-decoration: none;
+		font-size: 1.3em;
+		font-weight: 600;
+		color: white;
+	}
+	.access-button:hover {
+		background-color: var(--accent-dark);
+	}
+</style>
