@@ -29,4 +29,4 @@ CREATE TABLE IF NOT EXISTS post (
 );
 
 INSERT INTO source (id, name, url, type, active, created_at) VALUES
-(1, 'ArXiv CS', 'https://arxiv.org/list/cs/recent', 'paper', true, CURRENT_TIMESTAMP),
+(1, 'ArXiv CS', 'https://arxiv.org/list/cs/recent', 'paper', true, CURRENT_TIMESTAMP);
