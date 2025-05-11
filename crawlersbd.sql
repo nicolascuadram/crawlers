@@ -24,9 +24,11 @@ CREATE TABLE IF NOT EXISTS post (
   type text,
   published_at timestamp,
   created_at timestamp,
+  authors text, 
+  downloadArticleLink text, --Para las páginas de articulos que permitan descargar el paper, aquí vá el link
   log_id integer references log(id) on update cascade on delete cascade,
   sourcename text
 );
 
 INSERT INTO source (id, name, url, type, active, created_at) VALUES
-(1, 'ArXiv CS', 'https://arxiv.org/list/cs/recent', 'paper', true, CURRENT_TIMESTAMP),
+(1, 'ArXiv CS', 'https://arxiv.org/list/cs/recent', 'paper', true, CURRENT_TIMESTAMP);
