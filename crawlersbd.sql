@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS post (
   content text,
   url text,
   type text,
-  published_at timestamp,
+  published_at text,
   created_at timestamp,
   authors text, 
   downloadArticleLink text, --Para las páginas de articulos que permitan descargar el paper, aquí vá el link
@@ -30,5 +30,7 @@ CREATE TABLE IF NOT EXISTS post (
   sourcename text
 );
 
-INSERT INTO source (id, name, url, type, active, created_at) VALUES
-(1, 'ArXiv CS', 'https://arxiv.org/list/cs/recent', 'paper', true, CURRENT_TIMESTAMP);
+INSERT INTO source (id, name, url, type, active, created_at) VALUES (1, 'ArXiv CS', 'https://arxiv.org/list/cs/recent', 'paper', true, CURRENT_TIMESTAMP);
+
+
+INSERT INTO source (id, name, url, type, active, created_at) VALUES (2, 'Revista Iberoamericana de Educación', 'https://rieoei.org/RIE/issue/view/309', 'paper', true, CURRENT_TIMESTAMP);
