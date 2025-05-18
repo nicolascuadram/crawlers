@@ -5,8 +5,16 @@ from utils.htmltomd import html_to_markdown_selectolax
 
 SOURCE_NAME = "Revista Iberoamericana de Educación"
 
-def Scrape_rieoei(RIEOEI_URL: str):
-    response = requests.get(RIEOEI_URL)
+def Scrape_rieoei(RIEOEI_URL: str, limite_revistas: int = 3):
+    session = requests.Session()
+    session.headers.update({               # un User-Agent decente evita bloqueos tontos
+        "User-Agent": (
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Chrome/124.0 Safari/537.36"
+        )
+    })
+    response = session.get(RIEOEI_URL, timeout=15)
     posts = []
     if response.status_code != 200:
         print(f"Error al obtener la página: {response.status_code}")
@@ -14,26 +22,41 @@ def Scrape_rieoei(RIEOEI_URL: str):
 
     html = HTMLParser(response.text)
 
-    # Buscar todos los bloques de artículos
-    article_divs = html.css('div.obj_article_summary')
+    #buscar los links de las revistas
+    revistas_links = []
+    rinks = html.css('a.cover')
+    for link in rinks:
+        revistas_links.append((link.attributes['href']))
 
-    html_links = []
+    for link in revistas_links[:limite_revistas]:
+        response = session.get(link)
+        if response.status_code != 200:
+            print(f"Error al obtener la página: {response.status_code}")
+            return []
+        html = HTMLParser(response.text)
 
-    for div in article_divs:
-        # Buscar el enlace al archivo HTML (no PDF)
-        html_link_tag = div.css_first('a.obj_galley_link.file')
-        if html_link_tag and 'href' in html_link_tag.attributes:
-            html_href = html_link_tag.attributes['href']
-            html_links.append(html_href)
 
-    # Mostrar resultados
-    for link in html_links:
-        posts.append(follow_link(link))
+
+        # Buscar todos los bloques de artículos
+        article_divs = html.css('div.obj_article_summary')
+
+        html_links = []
+
+        for div in article_divs:
+            # Buscar el enlace al archivo HTML (no PDF)
+            html_link_tag = div.css_first('a.obj_galley_link.file')
+            if html_link_tag and 'href' in html_link_tag.attributes:
+                html_href = html_link_tag.attributes['href']
+                html_links.append(html_href)
+
+        # Mostrar resultados
+        for link in html_links:
+            posts.append(follow_link(link, session))
 
     return posts
 
-def follow_link(link: str) -> str:
-    response = requests.get(link)
+def follow_link(link: str, session) -> str:
+    response = session.get(link)
     if response.status_code != 200:
         print(f"Error al obtener la página: {response.status_code}")
         return ''
@@ -42,7 +65,7 @@ def follow_link(link: str) -> str:
     iframe_node = html.css_first("iframe")
     iframe_src = iframe_node.attributes["src"].strip()
 
-    html = HTMLParser(requests.get(iframe_src).text)
+    html = HTMLParser(session.get(iframe_src).text)
 
     title = ''
     summary = ''
@@ -108,7 +131,7 @@ def follow_link(link: str) -> str:
         
 
 if __name__ == "__main__":
-    posts = Scrape_rieoei('https://rieoei.org/RIE/issue/view/309')
+    posts = Scrape_rieoei('https://rieoei.org/RIE/issue/archive', limite_revistas=3)
     for post in posts:
         print(f"{post['title']} -> {post['url']}")
         print(post)

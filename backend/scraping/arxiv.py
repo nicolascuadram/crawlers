@@ -60,7 +60,7 @@ def Scrape_arxiv(ARXIV_URL :str):
             posts.append(post)
 
             # Solo buscar en los ultimos 20 posts
-            if len(posts) == 3:
+            if len(posts) == 10:
                 break
         except Exception as e:
             print(f"Error procesando un post: {e}")

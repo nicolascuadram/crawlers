@@ -33,4 +33,4 @@ CREATE TABLE IF NOT EXISTS post (
 INSERT INTO source (id, name, url, type, active, created_at) VALUES (1, 'ArXiv CS', 'https://arxiv.org/list/cs/recent', 'paper', true, CURRENT_TIMESTAMP);
 
 
-INSERT INTO source (id, name, url, type, active, created_at) VALUES (2, 'Revista Iberoamericana de Educación', 'https://rieoei.org/RIE/issue/view/309', 'paper', true, CURRENT_TIMESTAMP);
+INSERT INTO source (id, name, url, type, active, created_at) VALUES (2, 'Revista Iberoamericana de Educación', 'https://rieoei.org/RIE/issue/archive', 'paper', true, CURRENT_TIMESTAMP);
