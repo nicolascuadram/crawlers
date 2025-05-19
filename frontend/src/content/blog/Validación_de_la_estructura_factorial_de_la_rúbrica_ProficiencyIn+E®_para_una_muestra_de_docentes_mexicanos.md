@@ -4,8 +4,8 @@ description: "Resumen.Partiendo de la propuesta recogida en el conocido Informe 
 url: "https://rieoei.org/RIE/article/view/6452/4898"
 type: "paper"
 pubDate: " 09/07/2024"
-created_at: "2025-05-18 11:17:13.349325"
-log_id: 15
+created_at: "2025-05-19 16:03:01.291542"
+log_id: 24
 sourcename: Revista Iberoamericana de Educación
 author: Chantal Biencinto1
 heroImage: /revista.jpg
