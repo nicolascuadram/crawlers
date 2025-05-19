@@ -78,19 +78,16 @@ def follow_link(link: str, session) -> str:
     if title_tag:
         if title_tag:
             title = title_tag.text(strip=True)
-            print("titile", title)
     
     autor_tag = html.css_first('p.RIE-Autor')
     if autor_tag:
         autor = autor_tag.text(strip=True)
         autor = autor.split('http')[0]
-        print(autor)
         authors = autor
     
     summary_tag = html.css_first('p.RIE-S-ntesis1')
     if summary_tag:
         summary = summary_tag.text(strip=True)
-        print(summary)
     
     # content_tag = html.css_first('p.RIE-T-tulo1-Inicio')
     # print(content_tag)
@@ -113,7 +110,6 @@ def follow_link(link: str, session) -> str:
         published_at = published_at_tag[-1].text(strip=True)
         published_at = published_at.split(';')[0]
         published_at = published_at.split(':')[1]
-        print(published_at)
 
     post = {
         'title': title,

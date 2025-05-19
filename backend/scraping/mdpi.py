@@ -41,7 +41,9 @@ def Scrape_mdpi(url: str):
                 'url': paper_url,
                 'type': "paper",
                 'published_at': datetime.now(),
-                'sourcename': SOURCE_NAME
+                'sourcename': SOURCE_NAME,
+                'downloadArticleLink': 'pendiente',
+                'authors': 'pendiente'
             }
 
             posts.append(post)

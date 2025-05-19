@@ -63,6 +63,8 @@ for row in rows:
         heroImage = '/revista.jpg'
     if sourcename == "arXiv CS":
         heroImage = '/arxiv.jpg'
+    if sourcename == "MDPI":
+        heroImage = '/mdpi.jpg'
 
     markdown_content = f"""---
 title: {sanitize_value(title) or ''}
