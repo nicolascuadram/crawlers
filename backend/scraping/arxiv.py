@@ -43,7 +43,7 @@ def Scrape_arxiv(ARXIV_URL :str):
             paper_type = "paper"
 
             # Fecha de publicación: no está directamente aquí, así que ponemos hoy
-            published_at = datetime.now()
+            published_at = 'pendiente'
 
             post = {
                 'title': title,
@@ -51,6 +51,8 @@ def Scrape_arxiv(ARXIV_URL :str):
                 'content': content,
                 'url': paper_url,
                 'type': paper_type,
+                'authors': 'pendiente',
+                'downloadArticleLink': 'pendiente',
                 'published_at': published_at,
                 'sourcename': SOURCE_NAME
             }
@@ -58,7 +60,7 @@ def Scrape_arxiv(ARXIV_URL :str):
             posts.append(post)
 
             # Solo buscar en los ultimos 20 posts
-            if len(posts) == 20:
+            if len(posts) == 10:
                 break
         except Exception as e:
             print(f"Error procesando un post: {e}")

@@ -4,6 +4,7 @@ from psycopg2 import sql
 from dotenv import load_dotenv
 from scraping.arxiv import Scrape_arxiv
 from scraping.devto import Scrape_dev_to
+from scraping.rieoei import Scrape_rieoei
 
 # Cargar las variables de entorno
 load_dotenv()
@@ -65,8 +66,8 @@ def save_posts(conn, posts, log_id):
 
             # Insertar el nuevo post
             cursor.execute("""
-                INSERT INTO post (title, summary, content, url, type, published_at, created_at, log_id, sourcename)
-                VALUES (%s, %s, %s, %s, %s, %s, NOW(), %s, %s)
+                INSERT INTO post (title, summary, content, url, type, published_at, created_at, log_id, sourcename, downloadArticleLink, authors)
+                VALUES (%s, %s, %s, %s, %s, %s, NOW(), %s, %s, %s, %s)
             """, (
                 post['title'],
                 post['summary'],
@@ -75,7 +76,9 @@ def save_posts(conn, posts, log_id):
                 post['type'],
                 post['published_at'],
                 log_id,
-                post['sourcename']
+                post['sourcename'],
+                post['downloadArticleLink'],
+                post['authors']
             ))
         except Exception as e:
             print(f"Error insertando un post: {e}")
@@ -90,8 +93,10 @@ def scrape_source(source_name, source_url):
         return Scrape_arxiv(source_url)
     if source_name.lower() == 'dev to':
         return Scrape_dev_to(source_url)
+    if source_name.lower() == 'revista iberoamericana de educación':
+        return Scrape_rieoei(source_url)
     else:
-        print(f"No hay scraper configurado para {source_name}")
+        print(f"No hay scraper configurado para {source_name.lower()} ")
         return []
 
 def main():

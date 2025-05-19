@@ -7,7 +7,7 @@ import FormattedDate from '../components/FormattedDate.astro';
 
 type Props = CollectionEntry<'blog'>['data'];
 
-const { title, description, pubDate, updatedDate, heroImage, url, type, sourcename } = Astro.props;
+const { title, description, pubDate, created_at, heroImage, url, type, sourcename, author } = Astro.props;
 ---
 
 <html lang="es">
@@ -43,6 +43,8 @@ const { title, description, pubDate, updatedDate, heroImage, url, type, sourcena
 			}
 			.title h1 {
 				margin: 0 0 0.5em 0;
+				font-size: 2rem;
+				text-align: left;
 			}
 			.date {
 				margin-bottom: 0.5em;
@@ -50,6 +52,7 @@ const { title, description, pubDate, updatedDate, heroImage, url, type, sourcena
 			}
 			.last-updated-on {
 				font-style: italic;
+				text-align: left;
 			}
 		</style>
 	</head>
@@ -58,23 +61,25 @@ const { title, description, pubDate, updatedDate, heroImage, url, type, sourcena
 		<Header />
 		<main>
 			<article>
-				<div class="hero-image">
+				<!-- <div class="hero-image">
 					{heroImage && <img width={1020} height={510} src={heroImage} alt="" />}
-				</div>
+				</div> -->
 				<div class="prose">
 					<div class="title">
 						<div class="date">
-							<FormattedDate date={pubDate} />
-							{
-								updatedDate && (
+							<!-- <FormattedDate date={pubDate} /> -->
+							<p style="text-align: left;">{pubDate}</p>
+							<!-- {
+								created_at && (
 									<div class="last-updated-on">
-										Last updated on <FormattedDate date={updatedDate} />
+										Last updated on <FormattedDate date={created_at} />
 									</div>
 								)
-							}
+							} -->
 						</div>
 						<h1>{title}</h1>
 						<hr />
+						<p style="text-align: left;">{author}</p>
 					</div>
 					<p>{description}</p>
 					<slot />
