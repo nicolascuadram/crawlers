@@ -33,12 +33,43 @@ const formatTitle = (title: string, length: number) => {
 					id="search-input"
 					placeholder="Buscar por título..."
 				/>
+				<div class="filters">
+					<select id="source-filter" class="filter-select">
+						<option value="all">Todas las fuentes</option>
+						<option value="arXiv CS">ARXIV</option>
+						<option value="Revista Iberoamericana de Educación"
+							>Revista Iberoamericana de Educación</option
+						>
+					</select>
+					<button
+						id="sort-button"
+						class="sort-button"
+						aria-label="Cambiar orden de fecha"
+					>
+						<svg
+							id="sort-icon"
+							xmlns="http://www.w3.org/2000/svg"
+							fill="none"
+							stroke="white"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							class="icon"
+							viewBox="0 0 24 24"
+							><path d="m6 9 6 6 6-6"></path></svg
+						>
+					</button>
+				</div>
 			</section>
 			<section>
 				<ul>
 					{
 						posts.map((post) => (
-							<li data-title={post.data.title.toLowerCase()}>
+							<li
+								data-title={post.data.title.toLowerCase()}
+								data-date={post.data.created_at.valueOf()}
+								data-source={post.data.sourcename}
+							>
 								<a href={`/blog/${post.id}/`}>
 									<img
 										width={720}
@@ -65,17 +96,57 @@ const formatTitle = (title: string, length: number) => {
 		<script is:inline>
 			document.addEventListener("DOMContentLoaded", () => {
 				const input = document.getElementById("search-input");
-				const items = document.querySelectorAll("ul li");
+				const sourceSelect = document.getElementById("source-filter");
+				const sortButton = document.getElementById("sort-button");
+				const sortIcon = document.getElementById("sort-icon");
+				const list = document.querySelector("ul");
+				const allItems = Array.from(list.querySelectorAll("li"));
 
-				input.addEventListener("input", () => {
+				let sortOrder = "desc"; // default inicial
+
+				function updateSortIconRotation() {
+					sortIcon.style.transform =
+						sortOrder === "asc" ? "rotate(180deg)" : "rotate(0deg)";
+				}
+
+				function applyFilters() {
 					const query = input.value.toLowerCase();
+					const selectedSource = sourceSelect.value;
 
-					items.forEach((item) => {
+					const filteredItems = allItems.filter((item) => {
 						const title = item.getAttribute("data-title") || "";
-						const matches = title.includes(query);
-						item.style.display = matches ? "" : "none";
+						const source = item.getAttribute("data-source") || "";
+						const matchesTitle = title.includes(query);
+						const matchesSource =
+							selectedSource === "all" ||
+							source === selectedSource;
+						return matchesTitle && matchesSource;
 					});
+
+					filteredItems.sort((a, b) => {
+						const dateA = parseInt(a.getAttribute("data-date"), 10);
+						const dateB = parseInt(b.getAttribute("data-date"), 10);
+						return sortOrder === "asc"
+							? dateA - dateB
+							: dateB - dateA;
+					});
+
+					allItems.forEach((item) => (item.style.display = "none"));
+					filteredItems.forEach((item) => {
+						item.style.display = "";
+						list.appendChild(item);
+					});
+				}
+
+				input.addEventListener("input", applyFilters);
+				sourceSelect.addEventListener("change", applyFilters);
+				sortButton.addEventListener("click", () => {
+					sortOrder = sortOrder === "asc" ? "desc" : "asc";
+					updateSortIconRotation();
+					applyFilters();
 				});
+
+				updateSortIconRotation();
 			});
 		</script>
 	</body>
@@ -90,6 +161,7 @@ const formatTitle = (title: string, length: number) => {
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
+		gap: 0.5rem;
 		width: 100%;
 		margin-bottom: 1em;
 	}
@@ -105,6 +177,40 @@ const formatTitle = (title: string, length: number) => {
 	.search-filter-bar .search-input:focus {
 		border: 1px solid #ba0c2f;
 		outline: 1px solid #ba0c2f;
+	}
+	.search-filter-bar .filters {
+		display: flex;
+		gap: 0.5rem;
+	}
+	.search-filter-bar .filters .filter-select {
+		padding: 0.5rem;
+		font-size: 1rem;
+		max-width: 170px;
+		border: 1px solid #ccc;
+		border-radius: 12px;
+	}
+	.search-filter-bar .filters .filter-select:focus {
+		border: 1px solid #ba0c2f;	
+		outline: 1px solid #ba0c2f;
+	}
+	.search-filter-bar .filters .sort-button {
+		background-color: #ba0c2f;
+		border: 1px solid #ccc;
+		border-radius: 1000px;
+		padding: 0.4rem;
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		transition: background-color 0.2s ease;
+	}
+	.search-filter-bar .filters .sort-button:hover {
+		background-color: #9c0a27;
+	}
+	.search-filter-bar .filters .sort-button .icon {
+		width: 24px;
+		height: 24px;
+		transition: transform 0.3s ease;
 	}
 	ul {
 		display: flex;
@@ -125,8 +231,6 @@ const formatTitle = (title: string, length: number) => {
 		width: 100%;
 		margin-bottom: 1rem;
 		text-align: center;
-		/* padding-right: 10%;
-		padding-left: 10%; */
 	}
 	ul li:first-child img {
 		width: 100%;
