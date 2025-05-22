@@ -10,6 +10,8 @@ const posts = (await getCollection("blog")).sort(
 	(a, b) => b.data.created_at.valueOf() - a.data.created_at.valueOf(),
 );
 
+const sources = [...new Set(posts.map((post) => post.data.sourcename))];
+
 const formatTitle = (title: string, length: number) => {
 	if (title.length > length) {
 		return title.substring(0, length) + "...";
@@ -36,10 +38,11 @@ const formatTitle = (title: string, length: number) => {
 				<div class="filters">
 					<select id="source-filter" class="filter-select">
 						<option value="all">Todas las fuentes</option>
-						<option value="arXiv CS">ARXIV</option>
-						<option value="Revista Iberoamericana de Educación"
-							>Revista Iberoamericana de Educación</option
-						>
+						{
+							sources.map((source) => (
+								<option value={source}>{source}</option>
+							))
+						}
 					</select>
 					<button
 						id="sort-button"
@@ -190,7 +193,7 @@ const formatTitle = (title: string, length: number) => {
 		border-radius: 12px;
 	}
 	.search-filter-bar .filters .filter-select:focus {
-		border: 1px solid #ba0c2f;	
+		border: 1px solid #ba0c2f;
 		outline: 1px solid #ba0c2f;
 	}
 	.search-filter-bar .filters .sort-button {
