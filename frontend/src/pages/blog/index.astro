@@ -7,288 +7,312 @@ import { getCollection } from "astro:content";
 import FormattedDate from "../../components/FormattedDate.astro";
 
 const posts = (await getCollection("blog")).sort(
-	(a, b) => b.data.created_at.valueOf() - a.data.created_at.valueOf(),
+    (a, b) => b.data.created_at.valueOf() - a.data.created_at.valueOf()
 );
 
 const sources = [...new Set(posts.map((post) => post.data.sourcename))];
 
+// Separar primer post destacado
+const featuredPost = posts[0];
+const newsPosts = posts.slice(1);
+
 const formatTitle = (title: string, length: number) => {
-	if (title.length > length) {
-		return title.substring(0, length) + "...";
-	}
-	return title;
+    return title.length > length ? title.substring(0, length) + "..." : title;
 };
 ---
-
 <!doctype html>
 <html lang="es">
-	<head>
-		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
-	</head>
-	<body>
-		<Header />
-		<main>
-			<section class="search-filter-bar">
-				<input
-					type="text"
-					class="search-input"
-					id="search-input"
-					placeholder="Buscar por título..."
-				/>
-				<div class="filters">
-					<select id="source-filter" class="filter-select">
-						<option value="all">Todas las fuentes</option>
-						{
-							sources.map((source) => (
-								<option value={source}>{source}</option>
-							))
-						}
-					</select>
-					<button
-						id="sort-button"
-						class="sort-button"
-						aria-label="Cambiar orden de fecha"
-					>
-						<svg
-							id="sort-icon"
-							xmlns="http://www.w3.org/2000/svg"
-							fill="none"
-							stroke="white"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							class="icon"
-							viewBox="0 0 24 24"
-							><path d="m6 9 6 6 6-6"></path></svg
-						>
-					</button>
-				</div>
-			</section>
-			<section>
-				<ul>
-					{
-						posts.map((post) => (
-							<li
-								data-title={post.data.title.toLowerCase()}
-								data-date={post.data.created_at.valueOf()}
-								data-source={post.data.sourcename}
-							>
-								<a href={`/blog/${post.id}/`}>
-									<img
-										width={720}
-										height={360}
-										src={post.data.heroImage}
-										alt=""
-									/>
-									<h4 class="title">
-										{formatTitle(post.data.title, 150)}
-									</h4>
-									<p class="date">
-										<FormattedDate
-											date={post.data.created_at}
-										/>
-									</p>
-								</a>
-							</li>
-						))
-					}
-				</ul>
-			</section>
-		</main>
-		<Footer />
-		<script is:inline>
-			document.addEventListener("DOMContentLoaded", () => {
-				const input = document.getElementById("search-input");
-				const sourceSelect = document.getElementById("source-filter");
-				const sortButton = document.getElementById("sort-button");
-				const sortIcon = document.getElementById("sort-icon");
-				const list = document.querySelector("ul");
-				const allItems = Array.from(list.querySelectorAll("li"));
+    <head>
+        <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+    </head>
+    <body>
+        <Header />
+        <main>
+            <!-- Post destacado -->
+            <section class="featured-post">
+                <a href={`/blog/${featuredPost.id}/`}>
+                    <img src={featuredPost.data.heroImage} alt="" class="featured-img" />
+                    <h2>{formatTitle(featuredPost.data.title, 200)}</h2>
+                    <p class="date"><FormattedDate date={featuredPost.data.created_at} /></p>
+                </a>
+            </section>
 
-				let sortOrder = "desc"; // default inicial
+            <h3 class="section-title">Últimas Noticias</h3>
 
-				function updateSortIconRotation() {
-					sortIcon.style.transform =
-						sortOrder === "asc" ? "rotate(180deg)" : "rotate(0deg)";
-				}
+            <!-- Barra de filtros -->
+            <section class="search-filter-bar">
+                <input type="text" class="search-input" id="search-input" placeholder="Buscar por título..." />
+                <div class="filters">
+                    <select id="source-filter" class="filter-select">
+                        <option value="all">Todas las fuentes</option>
+                        {sources.map((source) => <option value={source}>{source}</option>)}
+                    </select>
+                    <button id="sort-button" class="sort-button" aria-label="Cambiar orden de fecha">
+                        <svg id="sort-icon" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="icon" viewBox="0 0 24 24">
+                            <path d="m6 9 6 6 6-6"></path>
+                        </svg>
+                    </button>
+                </div>
+            </section>
 
-				function applyFilters() {
-					const query = input.value.toLowerCase();
-					const selectedSource = sourceSelect.value;
+            <!-- Lista de noticias con paginación -->
+            <section id="post-section">
+                <ul id="post-list">
+                    {newsPosts.map((post, i) => (
+                        <li
+                            data-title={post.data.title.toLowerCase()}
+                            data-date={post.data.created_at.valueOf()}
+                            data-source={post.data.sourcename}
+                            class="post-item"
+                            style="display: none"
+                        >
+                            <a href={`/blog/${post.id}/`}>
+                                <img src={post.data.heroImage} alt="" width={720} height={360} />
+                                <h4 class="title">{formatTitle(post.data.title, 150)}</h4>
+                                <p class="date"><FormattedDate date={post.data.created_at} /></p>
+                            </a>
+                        </li>
+                    ))}
+                </ul>
+                <div class="pagination">
+                    <button id="prev-page" class="pagination-btn" disabled>Anterior</button>
+                    <span id="page-info" class="page-info">Página 1</span>
+                    <button id="next-page" class="pagination-btn">Siguiente</button>
+                </div>
+                <div class="element-count" id="element-count">
+                    Posts mostrados: (0/{newsPosts.length})
+                </div>
+            </section>
+        </main>
+        <Footer />
 
-					const filteredItems = allItems.filter((item) => {
-						const title = item.getAttribute("data-title") || "";
-						const source = item.getAttribute("data-source") || "";
-						const matchesTitle = title.includes(query);
-						const matchesSource =
-							selectedSource === "all" ||
-							source === selectedSource;
-						return matchesTitle && matchesSource;
-					});
+        <!-- Script de paginación -->
+        <script is:inline>
+            document.addEventListener("DOMContentLoaded", () => {
+                const input = document.getElementById("search-input");
+                const sourceSelect = document.getElementById("source-filter");
+                const sortButton = document.getElementById("sort-button");
+                const sortIcon = document.getElementById("sort-icon");
+                const list = document.getElementById("post-list");
+                const items = Array.from(list.querySelectorAll(".post-item"));
+                const prevBtn = document.getElementById("prev-page");
+                const nextBtn = document.getElementById("next-page");
+                const pageInfo = document.getElementById("page-info");
+                const elementCount = document.getElementById("element-count");
 
-					filteredItems.sort((a, b) => {
-						const dateA = parseInt(a.getAttribute("data-date"), 10);
-						const dateB = parseInt(b.getAttribute("data-date"), 10);
-						return sortOrder === "asc"
-							? dateA - dateB
-							: dateB - dateA;
-					});
+                let sortOrder = "desc";
+                let currentPage = 1;
+                const postsPerPage = 4;
+                let filtered = [];
 
-					allItems.forEach((item) => (item.style.display = "none"));
-					filteredItems.forEach((item) => {
-						item.style.display = "";
-						list.appendChild(item);
-					});
-				}
+                const filterItems = () => {
+                    const query = input.value.toLowerCase();
+                    const selectedSource = sourceSelect.value;
+                    filtered = items.filter(item => {
+                        const title = item.getAttribute("data-title");
+                        const source = item.getAttribute("data-source");
+                        return title.includes(query) && (selectedSource === "all" || source === selectedSource);
+                    });
+                    filtered.sort((a, b) => {
+                        const dateA = parseInt(a.getAttribute("data-date"));
+                        const dateB = parseInt(b.getAttribute("data-date"));
+                        return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
+                    });
+                };
 
-				input.addEventListener("input", applyFilters);
-				sourceSelect.addEventListener("change", applyFilters);
-				sortButton.addEventListener("click", () => {
-					sortOrder = sortOrder === "asc" ? "desc" : "asc";
-					updateSortIconRotation();
-					applyFilters();
-				});
+                const updatePagination = () => {
+                    const totalPages = Math.max(1, Math.ceil(filtered.length / postsPerPage));
+                    currentPage = Math.max(1, Math.min(currentPage, totalPages));
+                    pageInfo.textContent = `Página ${currentPage}`;
 
-				updateSortIconRotation();
-			});
-		</script>
-	</body>
+                    prevBtn.disabled = currentPage === 1;
+                    nextBtn.disabled = currentPage === totalPages;
+
+                    items.forEach(item => item.style.display = "none");
+                    const shownItems = filtered.slice((currentPage - 1) * postsPerPage, currentPage * postsPerPage);
+                    shownItems.forEach(item => item.style.display = "block");
+
+                    // Actualizar contador de elementos
+                    const start = (currentPage - 1) * postsPerPage + 1;
+					const end = Math.min(currentPage * postsPerPage, filtered.length);
+					elementCount.textContent = `Posts mostrados: (${end}/${filtered.length})`;
+                };
+
+                const applyFiltersAndReset = () => {
+                    filterItems();
+                    currentPage = 1;
+                    updatePagination();
+                };
+
+                const applyPagination = () => {
+                    updatePagination();
+                };
+
+                sortButton.addEventListener("click", () => {
+                    sortOrder = sortOrder === "asc" ? "desc" : "asc";
+                    sortIcon.style.transform = sortOrder === "asc" ? "rotate(180deg)" : "rotate(0deg)";
+                    applyFiltersAndReset();
+                });
+                input.addEventListener("input", applyFiltersAndReset);
+                sourceSelect.addEventListener("change", applyFiltersAndReset);
+                prevBtn.addEventListener("click", () => { currentPage--; applyPagination(); });
+                nextBtn.addEventListener("click", () => { currentPage++; applyPagination(); });
+
+                applyFiltersAndReset();
+            });
+        </script>
+    </body>
 </html>
 
 <style>
-	main {
-		padding-top: 1em;
+    main {
 		width: 840px;
+		margin: auto;
+		padding: 2rem 1rem;
+	}
+	.featured-post {
+		text-align: center;
+		margin-bottom: 2rem;
+	}
+	.featured-post img {
+		width: 100%;
+		border-radius: 12px;
+	}
+	.featured-post a {
+		text-decoration: none;         /* Quitar subrayado del enlace */
+		color: black;                  /* Asegurar color negro */
+	}
+	.featured-post h2 {
+		margin: 1rem 0 0.5rem;
+		font-size: 2rem;
+		color: var(--black);         /* Asegura color negro */
+		text-decoration: none;       /* Quita subrayado */
+		border-bottom: none;         /* Quita borde inferior si lo hubiera */
+	}
+	.section-title {
+		font-size: 1.8rem;
+		margin: 2rem 0 1rem;
 	}
 	.search-filter-bar {
 		display: flex;
-		justify-content: space-between;
-		align-items: center;
+		flex-wrap: wrap;
 		gap: 0.5rem;
-		width: 100%;
-		margin-bottom: 1em;
+		align-items: center;
+		margin-bottom: 1rem;
 	}
-	.search-filter-bar .search-input {
+	.search-input {
+		flex: 1;
 		padding: 0.5rem 1rem;
-		font-size: 1rem;
-		width: 100%;
-		max-width: 500px;
+		border-radius: 8px;
 		border: 1px solid #ccc;
-		border-radius: 12px;
-		outline: none;
 	}
-	.search-filter-bar .search-input:focus {
-		border: 1px solid #ba0c2f;
-		outline: 1px solid #ba0c2f;
-	}
-	.search-filter-bar .filters {
+	.filters {
 		display: flex;
 		gap: 0.5rem;
 	}
-	.search-filter-bar .filters .filter-select {
+	.filter-select,
+	.sort-button {
 		padding: 0.5rem;
-		font-size: 1rem;
-		max-width: 170px;
+		border-radius: 8px;
 		border: 1px solid #ccc;
-		border-radius: 12px;
 	}
-	.search-filter-bar .filters .filter-select:focus {
-		border: 1px solid #ba0c2f;
-		outline: 1px solid #ba0c2f;
-	}
-	.search-filter-bar .filters .sort-button {
+	.sort-button {
 		background-color: #ba0c2f;
-		border: 1px solid #ccc;
-		border-radius: 1000px;
-		padding: 0.4rem;
+		color: white;
 		cursor: pointer;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		transition: background-color 0.2s ease;
-	}
-	.search-filter-bar .filters .sort-button:hover {
-		background-color: #9c0a27;
-	}
-	.search-filter-bar .filters .sort-button .icon {
-		width: 24px;
-		height: 24px;
-		transition: transform 0.3s ease;
 	}
 	ul {
+		list-style: none;
 		display: flex;
 		flex-wrap: wrap;
-		gap: 2rem;
-		list-style-type: none;
-		margin: 0;
+		gap: 1rem;
 		padding: 0;
 	}
 	ul li {
-		width: calc(50% - 1rem);
-	}
-	ul li * {
-		text-decoration: none;
-		transition: 0.2s ease;
-	}
-	ul li:first-child {
-		width: 100%;
-		margin-bottom: 1rem;
-		text-align: center;
-	}
-	ul li:first-child img {
-		width: 100%;
-	}
-	ul li:first-child .title {
-		font-size: 1.4rem;
+		width: calc(50% - 0.5rem);
 	}
 	ul li img {
-		margin-bottom: 0.5rem;
-		border-radius: 12px;
+		width: 100%;
+		border-radius: 8px;
+	}
+	ul li .title {
+		font-size: 1.2rem;
+		margin: 0.5rem 0 0;
+		color: var(--black);         
+		text-decoration: none;       
+		border-bottom: none;         
+	}
+	ul li .title a {
+		color: var(--black);         
+		text-decoration: none;     
+		border-bottom: none;
+	}
+	ul li .title a:hover {
+		text-decoration: underline;
 	}
 	ul li a {
-		display: block;
+		text-decoration: none;    
+		color: black;              
 	}
-	.title {
-		margin: 0;
-		color: rgb(var(--black));
-		line-height: 1;
-		font-size: 1.3rem;
-		text-align: left;
+
+	ul li h4 {
+		color: black;             
+		text-decoration: none;     
+		margin: 0.5rem 0 0;
+		font-size: 1.2rem;
+	}
+
+	ul li h4 a {
+		color: black;                
+		text-decoration: none;         
+	}
+
+	ul li h4 a:hover {
+		text-decoration: underline;    
+	}
+	ul li.post-item:hover {
+		box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+		transform: translateY(-4px) scale(1.02);
+		transition: box-shadow 0.2s, transform 0.2s;
+		z-index: 1;
+	}
+	ul li.post-item:hover .title {
+		text-decoration: underline;
+		color: #ba0c2f; /* opcional: subraya y cambia a rojo institucional */
+		transition: color 0.2s;
 	}
 	.date {
-		margin: 0;
-		color: rgb(var(--gray));
+		color: #888;
+		font-size: 0.9rem;
+	}
+	.pagination {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		gap: 1rem;
+		margin-top: 2rem;
+	}
+	.pagination-btn {
+		padding: 0.5rem 1rem;
+		border: none;
+		background-color: #ba0c2f;
+		color: white;
+		cursor: pointer;
+		border-radius: 8px;
+	}
+	.pagination-btn:disabled {
+		background-color: #ccc;
+		cursor: default;
+	}
+	.element-count {
+		text-align: center;
+		margin-top: 1rem;
+		color: #555;
 		font-size: 1rem;
-		text-align: left;
-	}
-	ul li a:hover h4,
-	ul li a:hover .date {
-		color: rgb(var(--accent));
-	}
-	ul a:hover img {
-		box-shadow: var(--box-shadow);
 	}
 	@media (max-width: 720px) {
-		ul {
-			gap: 0.5em;
-		}
 		ul li {
 			width: 100%;
-			text-align: center;
-		}
-		ul li:first-child {
-			margin-bottom: 0;
-			padding-right: 0;
-			padding-left: 0;
-		}
-		ul li:first-child .title {
-			font-size: 1.1em;
-		}
-		ul li:first-child img {
-			width: 100%;
-		}
-		.title {
-			font-size: 1.1em;
 		}
 	}
 </style>
