@@ -4,6 +4,7 @@ from psycopg2 import sql
 from dotenv import load_dotenv
 from scraping.arxiv import Scrape_arxiv
 from scraping.devto import Scrape_dev_to
+from scraping.sciencedirect import Scrape_sciencedirect
 
 # Cargar las variables de entorno
 load_dotenv()
@@ -90,6 +91,7 @@ def scrape_source(source_name, source_url):
         return Scrape_arxiv(source_url)
     if source_name.lower() == 'dev to':
         return Scrape_dev_to(source_url)
+
     else:
         print(f"No hay scraper configurado para {source_name}")
         return []
