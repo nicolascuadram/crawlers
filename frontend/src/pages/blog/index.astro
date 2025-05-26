@@ -12,12 +12,10 @@ const posts = (await getCollection("blog")).sort(
 
 const sources = [...new Set(posts.map((post) => post.data.sourcename))];
 
-// Separar primer post destacado
-const featuredPost = posts[0];
 const newsPosts = posts.slice(1);
 
 const formatTitle = (title: string, length: number) => {
-    return title.length > length ? title.substring(0, length) + "..." : title;
+	return title.length > length ? `${title.substring(0, length)}...` : title;
 };
 ---
 <!doctype html>
@@ -28,17 +26,6 @@ const formatTitle = (title: string, length: number) => {
     <body>
         <Header />
         <main>
-            <!-- Post destacado -->
-            <section class="featured-post">
-                <a href={`/blog/${featuredPost.id}/`}>
-                    <img src={featuredPost.data.heroImage} alt="" class="featured-img" />
-                    <h2>{formatTitle(featuredPost.data.title, 200)}</h2>
-                    <p class="date"><FormattedDate date={featuredPost.data.created_at} /></p>
-                </a>
-            </section>
-
-            <h3 class="section-title">Últimas Noticias</h3>
-
             <!-- Barra de filtros -->
             <section class="search-filter-bar">
                 <input type="text" class="search-input" id="search-input" placeholder="Buscar por título..." />
@@ -121,22 +108,26 @@ const formatTitle = (title: string, length: number) => {
                 };
 
                 const updatePagination = () => {
-                    const totalPages = Math.max(1, Math.ceil(filtered.length / postsPerPage));
-                    currentPage = Math.max(1, Math.min(currentPage, totalPages));
-                    pageInfo.textContent = `Página ${currentPage}`;
+					const totalPages = Math.max(1, Math.ceil(filtered.length / postsPerPage));
+					currentPage = Math.max(1, Math.min(currentPage, totalPages));
+					pageInfo.textContent = `Página ${currentPage}`;
 
-                    prevBtn.disabled = currentPage === 1;
-                    nextBtn.disabled = currentPage === totalPages;
+					prevBtn.disabled = currentPage === 1;
+					nextBtn.disabled = currentPage === totalPages;
 
-                    items.forEach(item => item.style.display = "none");
-                    const shownItems = filtered.slice((currentPage - 1) * postsPerPage, currentPage * postsPerPage);
-                    shownItems.forEach(item => item.style.display = "block");
+					// Limpiar lista y volver a insertar los elementos ordenados
+					list.innerHTML = ""; // elimina todos los <li>
+					filtered.forEach(item => list.appendChild(item)); // reordenar el DOM según `filtered`
 
-                    // Actualizar contador de elementos
-                    const start = (currentPage - 1) * postsPerPage + 1;
+					// Ocultar todos y mostrar solo los de la página actual
+					filtered.forEach(item => item.style.display = "none");
+					const shownItems = filtered.slice((currentPage - 1) * postsPerPage, currentPage * postsPerPage);
+					shownItems.forEach(item => item.style.display = "block");
+
+					// Actualizar contador
 					const end = Math.min(currentPage * postsPerPage, filtered.length);
 					elementCount.textContent = `Posts mostrados: (${end}/${filtered.length})`;
-                };
+				};
 
                 const applyFiltersAndReset = () => {
                     filterItems();
@@ -166,124 +157,116 @@ const formatTitle = (title: string, length: number) => {
 
 <style>
     main {
+		padding-top: 1em;
 		width: 840px;
-		margin: auto;
-		padding: 2rem 1rem;
-	}
-	.featured-post {
-		text-align: center;
-		margin-bottom: 2rem;
-	}
-	.featured-post img {
-		width: 100%;
-		border-radius: 12px;
-	}
-	.featured-post a {
-		text-decoration: none;         /* Quitar subrayado del enlace */
-		color: black;                  /* Asegurar color negro */
-	}
-	.featured-post h2 {
-		margin: 1rem 0 0.5rem;
-		font-size: 2rem;
-		color: var(--black);         /* Asegura color negro */
-		text-decoration: none;       /* Quita subrayado */
-		border-bottom: none;         /* Quita borde inferior si lo hubiera */
-	}
-	.section-title {
-		font-size: 1.8rem;
-		margin: 2rem 0 1rem;
 	}
 	.search-filter-bar {
 		display: flex;
-		flex-wrap: wrap;
-		gap: 0.5rem;
+		justify-content: space-between;
 		align-items: center;
-		margin-bottom: 1rem;
+		gap: 0.5rem;
+		width: 100%;
+		margin-bottom: 1em;
 	}
-	.search-input {
-		flex: 1;
+	.search-filter-bar .search-input {
 		padding: 0.5rem 1rem;
-		border-radius: 8px;
+		font-size: 1rem;
+		width: 100%;
 		border: 1px solid #ccc;
+		border-radius: 12px;
+		outline: none;
 	}
-	.filters {
+	.search-filter-bar .search-input:focus {
+		border: 1px solid #ba0c2f;
+		outline: 1px solid #ba0c2f;
+	}
+	.search-filter-bar .filters {
 		display: flex;
 		gap: 0.5rem;
 	}
-	.filter-select,
-	.sort-button {
+	.search-filter-bar .filters .filter-select {
 		padding: 0.5rem;
-		border-radius: 8px;
+		font-size: 1rem;
+		max-width: 170px;
 		border: 1px solid #ccc;
+		border-radius: 12px;
 	}
-	.sort-button {
+	.search-filter-bar .filters .filter-select:focus {
+		border: 1px solid #ba0c2f;
+		outline: 1px solid #ba0c2f;
+	}
+	.search-filter-bar .filters .sort-button {
 		background-color: #ba0c2f;
-		color: white;
+		border: 1px solid #ccc;
+		border-radius: 1000px;
+		padding: 0.4rem;
 		cursor: pointer;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		transition: background-color 0.2s ease;
+	}
+	.search-filter-bar .filters .sort-button:hover {
+		background-color: #9c0a27;
+	}
+	.search-filter-bar .filters .sort-button .icon {
+		width: 24px;
+		height: 24px;
+		transition: transform 0.3s ease;
 	}
 	ul {
-		list-style: none;
 		display: flex;
 		flex-wrap: wrap;
-		gap: 1rem;
+		gap: 2rem;
+		list-style-type: none;
+		margin: 0;
 		padding: 0;
 	}
 	ul li {
-		width: calc(50% - 0.5rem);
+		width: calc(50% - 1rem);
+	}
+	ul li * {
+		text-decoration: none;
+		transition: 0.2s ease;
 	}
 	ul li img {
-		width: 100%;
-		border-radius: 8px;
-	}
-	ul li .title {
-		font-size: 1.2rem;
-		margin: 0.5rem 0 0;
-		color: var(--black);         
-		text-decoration: none;       
-		border-bottom: none;         
-	}
-	ul li .title a {
-		color: var(--black);         
-		text-decoration: none;     
-		border-bottom: none;
-	}
-	ul li .title a:hover {
-		text-decoration: underline;
+		margin-bottom: 0.5rem;
+		border-radius: 12px;
 	}
 	ul li a {
-		text-decoration: none;    
-		color: black;              
+		display: block;
 	}
-
-	ul li h4 {
-		color: black;             
-		text-decoration: none;     
-		margin: 0.5rem 0 0;
-		font-size: 1.2rem;
-	}
-
-	ul li h4 a {
-		color: black;                
-		text-decoration: none;         
-	}
-
-	ul li h4 a:hover {
-		text-decoration: underline;    
-	}
-	ul li.post-item:hover {
-		box-shadow: 0 4px 16px rgba(0,0,0,0.12);
-		transform: translateY(-4px) scale(1.02);
-		transition: box-shadow 0.2s, transform 0.2s;
-		z-index: 1;
-	}
-	ul li.post-item:hover .title {
-		text-decoration: underline;
-		color: #ba0c2f; /* opcional: subraya y cambia a rojo institucional */
-		transition: color 0.2s;
+	.title {
+		margin: 0;
+		color: rgb(var(--black));
+		line-height: 1;
+		font-size: 1.3rem;
+		text-align: left;
 	}
 	.date {
-		color: #888;
-		font-size: 0.9rem;
+		margin: 0;
+		color: rgb(var(--gray));
+		font-size: 1rem;
+		text-align: left;
+	}
+	ul li a:hover h4,
+	ul li a:hover .date {
+		color: rgb(var(--accent));
+	}
+	ul a:hover img {
+		box-shadow: var(--box-shadow);
+	}
+	@media (max-width: 720px) {
+		ul {
+			gap: 0.5em;
+		}
+		ul li {
+			width: 100%;
+			text-align: center;
+		}
+		.title {
+			font-size: 1.1em;
+		}
 	}
 	.pagination {
 		display: flex;
@@ -295,24 +278,25 @@ const formatTitle = (title: string, length: number) => {
 	.pagination-btn {
 		padding: 0.5rem 1rem;
 		border: none;
-		background-color: #ba0c2f;
+		background-color: var(--accent);
 		color: white;
 		cursor: pointer;
-		border-radius: 8px;
+		border-radius: 12px;
+		font-weight: 600;
 	}
 	.pagination-btn:disabled {
 		background-color: #ccc;
 		cursor: default;
+	}
+	.pagination-btn:hover:not(:disabled) {
+		background-color: var(--accent-dark);
+		box-shadow: var(--box-shadow);
+		transition: 0.2s ease;
 	}
 	.element-count {
 		text-align: center;
 		margin-top: 1rem;
 		color: #555;
 		font-size: 1rem;
-	}
-	@media (max-width: 720px) {
-		ul li {
-			width: 100%;
-		}
 	}
 </style>
