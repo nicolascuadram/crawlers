@@ -7,7 +7,22 @@ import FormattedDate from '../components/FormattedDate.astro';
 
 type Props = CollectionEntry<'blog'>['data'];
 
-const { title, description, pubDate, created_at, heroImage, url, type, sourcename, author } = Astro.props;
+const { title, description, pubDate, created_at, heroImage, url, type, sourcename, author, linkDownload } = Astro.props;
+
+
+function formatDate(inputDate) {
+  let date;
+  console.log(inputDate);
+  if (inputDate.includes('-')) {
+    inputDate = inputDate.split(' ')[0]
+  }
+  if (inputDate.includes('[')){
+    inputDate = inputDate.replaceAll('[', '')
+    inputDate = inputDate.replaceAll(']', '')
+  }
+  return inputDate
+
+}
 ---
 
 <html lang="es">
@@ -36,7 +51,6 @@ const { title, description, pubDate, created_at, heroImage, url, type, sourcenam
 				color: rgb(var(--gray-dark));
 			}
 			.title {
-				margin-bottom: 1em;
 				padding: 1em 0;
 				text-align: center;
 				line-height: 1;
@@ -47,7 +61,6 @@ const { title, description, pubDate, created_at, heroImage, url, type, sourcenam
 				text-align: left;
 			}
 			.date {
-				margin-bottom: 0.5em;
 				color: rgb(var(--gray));
 			}
 			.last-updated-on {
@@ -68,7 +81,7 @@ const { title, description, pubDate, created_at, heroImage, url, type, sourcenam
 					<div class="title">
 						<div class="date">
 							<!-- <FormattedDate date={pubDate} /> -->
-							<p style="text-align: left;">{pubDate}</p>
+							<p style="text-align: left;">{formatDate(pubDate)}</p>
 							<!-- {
 								created_at && (
 									<div class="last-updated-on">
@@ -81,11 +94,14 @@ const { title, description, pubDate, created_at, heroImage, url, type, sourcenam
 						<hr />
 						<p style="text-align: left;">{author}</p>
 					</div>
-					<p>{description}</p>
+          {description}
 					<slot />
-					<p>Visita la fuente original <a target="_blank" rel="noopener noreferrer" href={url}>{sourcename}</a></p>
-					<div style="text-align:center; margin: 2em 0;">
-						<a href="/blog" class="back-to-posts-btn">← Volver a los posts</a>
+          <div style="display:flex; align-items:baseline;gap:1rem; ">
+            <a class="back-to-posts-btn" href={linkDownload} target="_blank" rel="noopener noreferrer" >Ver articulo completo</a>
+            <p><a target="_blank" rel="noopener noreferrer" href={url} title={sourcename}>DOI</a></p>
+          </div>
+					<div style="text-align:left; margin: 2em 0;">
+						<a href="/blog" style="font-weight:bold">← Volver a los posts</a>
 					</div>
 				</div>
 			</article>
@@ -99,7 +115,7 @@ const { title, description, pubDate, created_at, heroImage, url, type, sourcenam
     display: inline-block;
     background-color: #ba0c2f;
     color: #fff;
-    padding: 0.75em 2em;
+    padding: 0.5em 1em;
     border-radius: 8px;
     text-decoration: none;
     font-weight: 600;

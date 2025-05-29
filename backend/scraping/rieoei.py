@@ -5,15 +5,18 @@ from utils.htmltomd import html_to_markdown_selectolax
 
 SOURCE_NAME = "Revista Iberoamericana de Educación"
 
+
 def Scrape_rieoei(RIEOEI_URL: str, limite_revistas: int = 3):
     session = requests.Session()
-    session.headers.update({               # un User-Agent decente evita bloqueos tontos
-        "User-Agent": (
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-            "AppleWebKit/537.36 (KHTML, like Gecko) "
-            "Chrome/124.0 Safari/537.36"
-        )
-    })
+    session.headers.update(
+        {  # un User-Agent decente evita bloqueos tontos
+            "User-Agent": (
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                "AppleWebKit/537.36 (KHTML, like Gecko) "
+                "Chrome/124.0 Safari/537.36"
+            )
+        }
+    )
     response = session.get(RIEOEI_URL, timeout=15)
     posts = []
     if response.status_code != 200:
@@ -22,11 +25,11 @@ def Scrape_rieoei(RIEOEI_URL: str, limite_revistas: int = 3):
 
     html = HTMLParser(response.text)
 
-    #buscar los links de las revistas
+    # buscar los links de las revistas
     revistas_links = []
-    rinks = html.css('a.cover')
+    rinks = html.css("a.cover")
     for link in rinks:
-        revistas_links.append((link.attributes['href']))
+        revistas_links.append((link.attributes["href"]))
 
     for link in revistas_links[:limite_revistas]:
         response = session.get(link)
@@ -35,18 +38,16 @@ def Scrape_rieoei(RIEOEI_URL: str, limite_revistas: int = 3):
             return []
         html = HTMLParser(response.text)
 
-
-
         # Buscar todos los bloques de artículos
-        article_divs = html.css('div.obj_article_summary')
+        article_divs = html.css("div.obj_article_summary")
 
         html_links = []
 
         for div in article_divs:
             # Buscar el enlace al archivo HTML (no PDF)
-            html_link_tag = div.css_first('a.obj_galley_link.file')
-            if html_link_tag and 'href' in html_link_tag.attributes:
-                html_href = html_link_tag.attributes['href']
+            html_link_tag = div.css_first("a.obj_galley_link.file")
+            if html_link_tag and "href" in html_link_tag.attributes:
+                html_href = html_link_tag.attributes["href"]
                 html_links.append(html_href)
 
         # Mostrar resultados
@@ -55,40 +56,42 @@ def Scrape_rieoei(RIEOEI_URL: str, limite_revistas: int = 3):
 
     return posts
 
+
 def follow_link(link: str, session) -> str:
     response = session.get(link)
     if response.status_code != 200:
         print(f"Error al obtener la página: {response.status_code}")
-        return ''
+        return ""
     html = HTMLParser(response.text)
+    doi = html.css_first("a.title").attributes["href"]
 
     iframe_node = html.css_first("iframe")
     iframe_src = iframe_node.attributes["src"].strip()
 
     html = HTMLParser(session.get(iframe_src).text)
 
-    title = ''
-    summary = ''
-    content = ''
-    published_at = ''
-    authors = ''
-    downloadArticleLink = ''
+    title = ""
+    summary = ""
+    content = ""
+    published_at = ""
+    authors = ""
+    downloadArticleLink = ""
 
-    title_tag = html.css_first('p.RIE-Titular')
+    title_tag = html.css_first("p.RIE-Titular")
     if title_tag:
         if title_tag:
             title = title_tag.text(strip=True)
-    
-    autor_tag = html.css_first('p.RIE-Autor')
+
+    autor_tag = html.css_first("p.RIE-Autor")
     if autor_tag:
         autor = autor_tag.text(strip=True)
-        autor = autor.split('http')[0]
+        autor = autor.split("http")[0]
         authors = autor
-    
-    summary_tag = html.css_first('p.RIE-S-ntesis1')
+
+    summary_tag = html.css_first("p.RIE-S-ntesis1")
     if summary_tag:
         summary = summary_tag.text(strip=True)
-    
+
     # content_tag = html.css_first('p.RIE-T-tulo1-Inicio')
     # print(content_tag)
     # if content_tag:
@@ -104,30 +107,29 @@ def follow_link(link: str, session) -> str:
     #     #content = selected_html.text(strip=True)
     #     #print(content[:500])
 
-
-    published_at_tag = html.css('p.RIE-MID')
+    published_at_tag = html.css("p.RIE-MID")
     if published_at_tag:
         published_at = published_at_tag[-1].text(strip=True)
-        published_at = published_at.split(';')[0]
-        published_at = published_at.split(':')[1]
+        published_at = published_at.split(";")[0]
+        published_at = published_at.split(":")[1]
 
     post = {
-        'title': title,
-        'summary': summary,
-        'content': content,
-        'url': link,
-        'type': 'paper',
-        'published_at': published_at,
-        'sourcename': SOURCE_NAME,
-        'downloadArticleLink': downloadArticleLink,
-        'authors': authors
-        } 
-    
+        "title": title,
+        "summary": summary,
+        "content": content,
+        "url": doi,
+        "type": "paper",
+        "published_at": published_at,
+        "sourcename": SOURCE_NAME,
+        "downloadArticleLink": link,
+        "authors": authors,
+    }
+
     return post
-        
+
 
 if __name__ == "__main__":
-    posts = Scrape_rieoei('https://rieoei.org/RIE/issue/archive', limite_revistas=3)
+    posts = Scrape_rieoei("https://rieoei.org/RIE/issue/archive", limite_revistas=3)
     for post in posts:
         print(f"{post['title']} -> {post['url']}")
         print(post)
