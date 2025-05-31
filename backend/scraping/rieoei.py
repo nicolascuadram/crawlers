@@ -90,7 +90,11 @@ def follow_link(link: str, session) -> str:
 
     summary_tag = html.css_first("p.RIE-S-ntesis1")
     if summary_tag:
-        summary = summary_tag.text(strip=True)
+        content = summary_tag.text(strip=True)
+
+    keywords = html.css_first("p.RIE-PalabrasClave2")
+    if keywords:
+        summary = keywords.text(strip=True)
 
     # content_tag = html.css_first('p.RIE-T-tulo1-Inicio')
     # print(content_tag)

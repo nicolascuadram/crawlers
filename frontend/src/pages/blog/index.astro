@@ -17,6 +17,23 @@ const newsPosts = posts.slice(1);
 const formatTitle = (title: string, length: number) => {
 	return title.length > length ? `${title.substring(0, length)}...` : title;
 };
+
+const formatKeywords = (source: string, description: string) => {
+  if (source === "Revista Iberoamericana de Educación") {
+    description = description.split(":")[1] || description;
+  }
+  if (source == "MDPI"){
+  description = "pendiente;pendiente"
+  }
+  // Primero split por ';', luego cada fragmento por ',' y limpiamos espacios
+  const keywords = description
+    .split(';')
+    .flatMap(part => part.split(','))
+    .map(k => k.trim())
+    .filter(k => k.length > 0); // Elimina elementos vacíos
+
+  return [source, ...keywords];
+  };
 ---
 <!doctype html>
 <html lang="es">
@@ -54,9 +71,26 @@ const formatTitle = (title: string, length: number) => {
                             style="display: none"
                         >
                             <a href={`/blog/${post.id}/`}>
-                                <img src={post.data.heroImage} alt="" width={720} height={360} />
+                              
                                 <h4 class="title">{formatTitle(post.data.title, 150)}</h4>
                                 <p class="date"><FormattedDate date={post.data.created_at} /></p>
+                                <ul class="tags">
+                                                                {formatKeywords(post.data.sourcename, post.data.description).map((keyword, index) => {
+    const isFirst = index === 0;
+    let extraClass = "";
+
+    if (isFirst) {
+        extraClass = "source-default";
+    }
+
+    return (
+      <span className={`keyword ${isFirst ? extraClass : "keyword-neutral"}`} key={index}>
+        {keyword}
+      </span>
+    );
+  })}
+                                </ul>
+                                
                             </a>
                         </li>
                     ))}
@@ -158,14 +192,15 @@ const formatTitle = (title: string, length: number) => {
 <style>
     main {
 		padding-top: 1em;
-		width: 840px;
+		width: 100%;
 	}
 	.search-filter-bar {
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
 		gap: 0.5rem;
-		width: 100%;
+		width: 80%;
+    margin: 0 auto;
 		margin-bottom: 1em;
 	}
 	.search-filter-bar .search-input {
@@ -214,26 +249,40 @@ const formatTitle = (title: string, length: number) => {
 		height: 24px;
 		transition: transform 0.3s ease;
 	}
-	ul {
+	#post-list {
 		display: flex;
+    width: 80%;
+    margin: 0 auto;
 		flex-wrap: wrap;
 		gap: 2rem;
 		list-style-type: none;
-		margin: 0;
 		padding: 0;
 	}
-	ul li {
-		width: calc(50% - 1rem);
+	#post-list li {
+		width: calc(45% - 2rem);
+    border:1px solid #eee;
+      border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: box-shadow 0.3s ease, transform 0.2s ease;
 	}
-	ul li * {
+  #post-list li:hover {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  transform: translateY(-4px);
+}
+	#post-list li * {
 		text-decoration: none;
 		transition: 0.2s ease;
+
 	}
-	ul li img {
+	#post-list li img {
 		margin-bottom: 0.5rem;
 		border-radius: 12px;
 	}
-	ul li a {
+	#post-list li a {
 		display: block;
 	}
 	.title {
@@ -257,10 +306,10 @@ const formatTitle = (title: string, length: number) => {
 		box-shadow: var(--box-shadow);
 	}
 	@media (max-width: 720px) {
-		ul {
+		#post-list ul {
 			gap: 0.5em;
 		}
-		ul li {
+		#post-list ul li {
 			width: 100%;
 			text-align: center;
 		}
@@ -299,4 +348,31 @@ const formatTitle = (title: string, length: number) => {
 		color: #555;
 		font-size: 1rem;
 	}
+  .tags {
+    display: flex;
+    flex-wrap: wrap; /* permite que los tags se ajusten a varias líneas */
+  gap: 0.4rem; /* espacio entre los tags */
+  list-style: none; /* opcional, elimina los puntos de lista */
+  padding: 0; /* opcional, elimina el padding por defecto */
+  margin: 10px auto; /* opcional, elimina el margin por defecto */
+}
+.keyword {
+  display: inline-block;
+  background-color: gray;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  padding: 0.2rem 0.5rem;
+  color: white;
+  white-space: nowrap;
+  width: fit-content;
+}
+
+.keyword-neutral {
+  background-color: #eee; /* gris sutil */
+  color: #333;
+}
+.source-default {
+  background-color: #6c757d; 
+}
+  
 </style>

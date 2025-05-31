@@ -70,6 +70,9 @@ for row in rows:
     if summary is None or summary.strip() == "":
         print(f"Post sin resumen, omitido: {filepath}")
         continue
+    if content is None or content.strip() == "":
+        print(f"Post sin contenido, omitido: {filepath}")
+        continue
 
     heroImage = ""
     if sourcename == "Revista Iberoamericana de Educación":
