@@ -23,4 +23,4 @@ pnpm-debug.log*
 .idea/
 
 # posts
-src/content/blog/*.md
+#src/content/blog/*.md
