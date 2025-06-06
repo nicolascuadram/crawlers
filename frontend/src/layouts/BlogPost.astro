@@ -10,6 +10,12 @@ type Props = CollectionEntry<'blog'>['data'];
 const { title, description, pubDate, created_at, heroImage, url, type, sourcename, author, linkDownload } = Astro.props;
 
 
+function formatAuthors(authors){
+	let s = authors.replaceAll('"', '')
+	s= s.replaceAll(',', ', ')
+	return s
+}
+
 function formatDate(inputDate) {
   let date;
   console.log(inputDate);
@@ -28,9 +34,7 @@ const formatKeywords = (source: string, description: string) => {
   if (source === "Revista Iberoamericana de Educación") {
     description = description.split(":")[1] || description;
   }
-  if (source == "MDPI"){
-  description = "pendiente;pendiente"
-  }
+  
   // Primero split por ';', luego cada fragmento por ',' y limpiamos espacios
   const keywords = description
     .split(';')
@@ -109,7 +113,7 @@ const formatKeywords = (source: string, description: string) => {
 							} -->
 						</div>
 						<h1>{title}</h1>
-						<p style="text-align: left;">{author}</p>
+						<p style="text-align: left;">{formatAuthors(author)}</p>
             <div class="keywords" style="display: flex; flex-wrap: wrap; gap: 0.4rem;">
             {formatKeywords(sourcename,description).map((keyword) => (
             <span class="badge" style="margin-right: 0.5rem; background-color: #eee; padding: 0.25rem 0.5rem; border-radius: 8px;font-size:.95rem">{keyword}</span>

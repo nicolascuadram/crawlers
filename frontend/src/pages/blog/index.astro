@@ -22,9 +22,7 @@ const formatKeywords = (source: string, description: string) => {
   if (source === "Revista Iberoamericana de Educación") {
     description = description.split(":")[1] || description;
   }
-  if (source == "MDPI"){
-  description = "pendiente;pendiente"
-  }
+  
   // Primero split por ';', luego cada fragmento por ',' y limpiamos espacios
   const keywords = description
     .split(';')

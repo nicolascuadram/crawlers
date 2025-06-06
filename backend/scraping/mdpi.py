@@ -1,63 +1,32 @@
-import requests
-from bs4 import BeautifulSoup
+import feedparser
 from datetime import datetime
 
 SOURCE_NAME = "MDPI"
-
-MDPI_URL = "https://www.mdpi.com/search?sort=pubdate&page_count=100&view=default"
-
-def getContent(article_div):
-    abstract_div = article_div.find("div", class_="abstract-cropped inline")
-    if abstract_div:
-        return abstract_div.get_text(strip=True)
-    return ""
+# RSS con artículos más recientes de todas las revistas
+MDPI_RSS_URL = "https://www.mdpi.com/rss?sort=pubdate&page_count=100&view=default"
 
 def Scrape_mdpi(url: str):
-    response = requests.get(url)
-    if response.status_code != 200:
-        print(f"Error al obtener la página: {response.status_code}")
-        return []
-
-    soup = BeautifulSoup(response.content, "html.parser")
-
+    feed = feedparser.parse(url)
+    #print(feed.entries[0])
     posts = []
-    articles = soup.find_all("div", class_="generic-item article-item")
 
-    for article in articles:
-        try:
-            # Título y URL
-            content_div = article.find("div", class_="article-content")
-            link_tag = content_div.find("a", class_="title-link")
-            title = link_tag.text.strip()
-            paper_url = "https://www.mdpi.com" + link_tag["href"]
-
-            # Contenido del abstract
-            content = getContent(article)
-
-            post = {
-                'title': title,
-                'summary': content[:200] + "...",  # primer fragmento como resumen
-                'content': content,
-                'url': paper_url,
-                'type': "paper",
-                'published_at': datetime.now(),
-                'sourcename': SOURCE_NAME,
-                'downloadArticleLink': 'pendiente',
-                'authors': 'pendiente'
-            }
-
-            posts.append(post)
-
-            if len(posts) == 20:
-                break
-
-        except Exception as e:
-            print(f"Error procesando un artículo: {e}")
-            continue
+    for entry in feed.entries[:20]:  # Solo los primeros 20
+        post = {
+            'title': entry.title,
+            'summary': "",
+            'content': entry.summary if 'summary' in entry else '',
+            'url': entry.link,
+            'type': "paper",
+            'published_at': entry.published if 'published' in entry else '',
+            'sourcename': SOURCE_NAME,
+            'downloadArticleLink': entry.id, 
+            'authors': [a['name'] for a in entry.authors] if 'authors' in entry else [entry.author] if 'author' in entry else []
+        }
+        posts.append(post)
 
     return posts
 
 if __name__ == "__main__":
-    posts = Scrape_mdpi(MDPI_URL)
+    posts = Scrape_mdpi(MDPI_RSS_URL)
     for post in posts:
         print(post)

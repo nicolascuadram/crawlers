@@ -35,4 +35,4 @@ INSERT INTO source (id, name, url, type, active, created_at) VALUES (1, 'ArXiv C
 
 INSERT INTO source (id, name, url, type, active, created_at) VALUES (2, 'Revista Iberoamericana de Educación', 'https://rieoei.org/RIE/issue/archive', 'paper', true, CURRENT_TIMESTAMP);
 
-INSERT INTO source (id, name, url, type, active, created_at) VALUES (3, 'MDPI', 'https://www.mdpi.com/search?sort=pubdate&page_count=100&view=default', 'paper', true, CURRENT_TIMESTAMP);
+INSERT INTO source (id, name, url, type, active, created_at) VALUES (3, 'MDPI', 'https://www.mdpi.com/rss?sort=pubdate&page_count=100&view=default', 'paper', true, CURRENT_TIMESTAMP);

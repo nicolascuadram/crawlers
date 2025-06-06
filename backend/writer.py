@@ -27,6 +27,8 @@ def sanitize_value(value):
     if value is None:
         return None
     value = str(value).replace("\n", " ").replace('"', '\\"')
+    value = str(value).replace("{", "")
+    value = str(value).replace("}", "")
     return f'"{value}"'
 
 
@@ -67,9 +69,6 @@ for row in rows:
         print(f"Post sin título, omitido: {filepath}")
         continue
 
-    if summary is None or summary.strip() == "":
-        print(f"Post sin resumen, omitido: {filepath}")
-        continue
     if content is None or content.strip() == "":
         print(f"Post sin contenido, omitido: {filepath}")
         continue
@@ -84,14 +83,14 @@ for row in rows:
 
     markdown_content = f"""---
 title: {sanitize_value(title) or ""}
-description: {sanitize_value(summary) or ""}
+description: {sanitize_value(summary) or "sin_etiqueta"}
 url: {sanitize_value(url) or ""}
 type: {sanitize_value(type_) or ""}
 pubDate: {sanitize_value(published_at) or ""}
 created_at: {sanitize_value(created_at) or ""}
 log_id: {log_id or ""}
 sourcename: {sourcename or ""}
-author: {authors or ""}
+author: {sanitize_value(authors) or ""}
 heroImage: {heroImage or "/blog-placeholder-3.jpg"}
 linkDownload: {sanitize_value(downloadArticleLink) or ""}
 ---
