@@ -13,7 +13,7 @@ def Scrape_mdpi(url: str):
     for entry in feed.entries[:20]:  # Solo los primeros 20
         post = {
             'title': entry.title,
-            'summary': "",
+            'summary': entry.prism_publicationname if 'prism_publicationname'in entry else '',
             'content': entry.summary if 'summary' in entry else '',
             'url': entry.link,
             'type': "paper",
@@ -29,4 +29,5 @@ def Scrape_mdpi(url: str):
 if __name__ == "__main__":
     posts = Scrape_mdpi(MDPI_RSS_URL)
     for post in posts:
-        print(post)
+        #print(post)
+        pass
