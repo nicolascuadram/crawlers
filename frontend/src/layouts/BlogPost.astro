@@ -34,7 +34,6 @@ const formatKeywords = (source: string, description: string) => {
   if (source === "Revista Iberoamericana de Educación") {
     description = description.split(":")[1] || description;
   }
-  
   // Primero split por ';', luego cada fragmento por ',' y limpiamos espacios
   const keywords = description
     .split(';')
