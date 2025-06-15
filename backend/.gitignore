@@ -1,5 +1,6 @@
 # environment variables
 .env
+venv
 
 # scraping
 scraping/__pycache__/*-312.pyc
