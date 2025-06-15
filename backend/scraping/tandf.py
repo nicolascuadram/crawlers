@@ -11,7 +11,7 @@ SOURCE_NAME = "Taylor & Francis"
 
 def init_firefox_driver():
     options = Options()
-    options.headless = False  # Muy importante para correr sin interfaz gráfica
+    options.headless = True# Muy importante para correr sin interfaz gráfica
     return webdriver.Firefox(options=options)
 
 

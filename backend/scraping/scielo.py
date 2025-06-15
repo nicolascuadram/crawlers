@@ -10,7 +10,7 @@ SOURCE_NAME = "SciELO Chile"
 
 def init_firefox_driver():
     options = Options()
-    options.headless = False  # Cambiar a True para que no se abra la ventana
+    options.headless = True# Cambiar a True para que no se abra la ventana
     return webdriver.Firefox(options=options)
 
 def scrape_scielo(journal_url):
