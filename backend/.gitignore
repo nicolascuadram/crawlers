@@ -1,0 +1,6 @@
+# environment variables
+.env
+
+# scraping
+scraping/__pycache__/*-312.pyc
+utils/__pycache__/*-312.pyc

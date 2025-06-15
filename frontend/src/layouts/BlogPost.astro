@@ -7,7 +7,43 @@ import FormattedDate from '../components/FormattedDate.astro';
 
 type Props = CollectionEntry<'blog'>['data'];
 
-const { title, description, pubDate, created_at, heroImage, url, type, sourcename, author } = Astro.props;
+const { title, description, pubDate, created_at, heroImage, url, type, sourcename, author, linkDownload } = Astro.props;
+
+
+function formatAuthors(authors){
+	let s = authors.replaceAll('"', '')
+	s= s.replaceAll(',', ', ')
+	return s
+}
+
+function formatDate(inputDate) {
+  let date;
+  console.log(inputDate);
+  if (inputDate.includes('-')) {
+    inputDate = inputDate.split(' ')[0]
+  }
+  if (inputDate.includes('[')){
+    inputDate = inputDate.replaceAll('[', '')
+    inputDate = inputDate.replaceAll(']', '')
+  }
+  return inputDate
+
+}
+
+const formatKeywords = (source: string, description: string) => {
+  if (source === "Revista Iberoamericana de Educación") {
+    description = description.split(":")[1] || description;
+  }
+  // Primero split por ';', luego cada fragmento por ',' y limpiamos espacios
+  const keywords = description
+    .split(';')
+    .flatMap(part => part.split(','))
+    .map(k => k.trim())
+    .filter(k => k.length > 0); // Elimina elementos vacíos
+
+  return [...keywords];
+  };
+
 ---
 
 <html lang="es">
@@ -36,7 +72,6 @@ const { title, description, pubDate, created_at, heroImage, url, type, sourcenam
 				color: rgb(var(--gray-dark));
 			}
 			.title {
-				margin-bottom: 1em;
 				padding: 1em 0;
 				text-align: center;
 				line-height: 1;
@@ -47,7 +82,6 @@ const { title, description, pubDate, created_at, heroImage, url, type, sourcenam
 				text-align: left;
 			}
 			.date {
-				margin-bottom: 0.5em;
 				color: rgb(var(--gray));
 			}
 			.last-updated-on {
@@ -68,7 +102,7 @@ const { title, description, pubDate, created_at, heroImage, url, type, sourcenam
 					<div class="title">
 						<div class="date">
 							<!-- <FormattedDate date={pubDate} /> -->
-							<p style="text-align: left;">{pubDate}</p>
+							<p style="text-align: left;">{formatDate(pubDate)}</p>
 							<!-- {
 								created_at && (
 									<div class="last-updated-on">
@@ -78,15 +112,44 @@ const { title, description, pubDate, created_at, heroImage, url, type, sourcenam
 							} -->
 						</div>
 						<h1>{title}</h1>
+						<p style="text-align: left;">{formatAuthors(author)}</p>
+            <div class="keywords" style="display: flex; flex-wrap: wrap; gap: 0.4rem;">
+            {formatKeywords(sourcename,description).map((keyword) => (
+            <span class="badge" style="margin-right: 0.5rem; background-color: #eee; padding: 0.25rem 0.5rem; border-radius: 8px;font-size:.95rem">{keyword}</span>
+          ))}
+            </div>
 						<hr />
-						<p style="text-align: left;">{author}</p>
+            
 					</div>
-					<p>{description}</p>
+          
 					<slot />
-					<p>Visita la fuente original <a href={url}>{sourcename}</a></p>
+          <div style="display:flex; align-items:baseline;gap:1rem; ">
+            <a class="back-to-posts-btn" href={linkDownload} target="_blank" rel="noopener noreferrer" >Ver articulo completo</a>
+            <p><a target="_blank" rel="noopener noreferrer" href={url} title={sourcename}>DOI</a></p>
+          </div>
+					<div style="text-align:left; margin: 2em 0;">
+						<a href="/blog" style="font-weight:bold">← Volver a los posts</a>
+					</div>
 				</div>
 			</article>
 		</main>
 		<Footer />
 	</body>
 </html>
+
+<style>
+.back-to-posts-btn {
+    display: inline-block;
+    background-color: #ba0c2f;
+    color: #fff;
+    padding: 0.5em 1em;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    margin-top: 2em;
+    transition: background 0.2s;
+}
+.back-to-posts-btn:hover {
+    background-color: #8a0a23;
+}
+</style>

@@ -16,9 +16,10 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 			<div class="hero">
 				<h1>El sitio web de noticias sobre informática</h1>
 				<h5>Dev News unifica las novedades en tecnología de diversas fuentes en un solo lugar!</h5>
-				<button class="access-button">
+				<!-- <button class="access-button">
 					<a href="/blog">Ver artículos</a>
-				</button>
+				</button> -->
+				<a href="/blog" class="access-button">Ver artículos</a>
 			</div>
 			<p>
 				Bienvenido a <strong>Dev News</strong>, un blog de tecnología y programación donde compartimos noticias, tutoriales y recursos
@@ -64,20 +65,20 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 		color: gray;
 	}
 	.access-button {
-		margin: 4em auto;
-		padding: 1.2em 3em;
+		display: inline-block;
 		background-color: var(--accent);
+		margin: 2em 0;
+		padding: 12px 32px;
 		border: none;
-		border-radius: 24px;
-		cursor: pointer;
-	}
-	.access-button a {
+		border-radius: 12px;
 		text-decoration: none;
-		font-size: 1.3em;
+		font-size: 1em;
 		font-weight: 600;
 		color: white;
 	}
 	.access-button:hover {
 		background-color: var(--accent-dark);
+		box-shadow: var(--box-shadow);
+		transition: 0.2s ease;
 	}
 </style>

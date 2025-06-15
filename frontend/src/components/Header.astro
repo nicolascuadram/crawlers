@@ -1,19 +1,12 @@
 ---
-import { SITE_TITLE } from '../consts';
+import { SITE_TITLE } from "../consts";
 ---
 
 <header>
 	<nav>
-		<h2><a href="/">{SITE_TITLE}</a></h2>
-		<div class="search-container">
-			<input
-				type="text"
-				placeholder="Buscar..."
-				aria-label="Buscar"
-				class="search-input"
-				autocomplete="on"
-				>
-		</div>
+		<a href="/">
+			<h2>{SITE_TITLE}</h2>
+		</a>
 	</nav>
 </header>
 <style>
@@ -23,22 +16,13 @@ import { SITE_TITLE } from '../consts';
 		background: white;
 		box-shadow: 0 2px 8px rgba(var(--black), 5%);
 	}
-	h2 {
-		margin: 0;
-		font-size: 1em;
-	}
-
-	h2 a,
-	h2 a.active {
-		text-decoration: none;
-	}
 	nav {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
 	}
 	nav a {
-		padding: 1em 0.5em;
+		padding: 16px 8px;
 		color: var(--black);
 		border-bottom: 4px solid transparent;
 		text-decoration: none;
@@ -46,6 +30,14 @@ import { SITE_TITLE } from '../consts';
 	nav a.active {
 		text-decoration: none;
 		border-bottom-color: var(--accent);
+	}
+	nav a h2 {
+		margin: 0;
+		font-size: 1em;
+	}
+	nav a h2:hover {
+		color: var(--accent);
+		transition: 0.2s ease;
 	}
 	.social-links,
 	.social-links a {

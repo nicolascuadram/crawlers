@@ -1,0 +1,97 @@
+---
+
+const { keywords = "", sourcename = "" } = Astro.props;
+
+function getFirstTagClass(source) {
+  switch (source.toLowerCase()) {
+    case "arxiv cs":
+      return "arxiv";
+    case "taylor & francis":
+      return "tandf";
+    case "revista iberoamericana de educación":
+      return "rie";
+    case "mdpi":
+      return "mdpi";
+    default:
+      return "tag-default";
+  }
+}
+
+const formatKeywords = (source: string, description: string) => {
+  if (source === "Revista Iberoamericana de Educación") {
+    description = description.split(":")[1] || description;
+  }
+
+  // Primero split por ';', luego cada fragmento por ',' y limpiamos espacios
+  const keywords = description
+    .split(";")
+    .flatMap((part) => part.split(","))
+    .map((k) => k.trim())
+    .filter((k) => k.length > 0); // Elimina elementos vacíos
+
+  return [source, ...keywords];
+};
+---
+<style>
+  ul.tags {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .keyword {
+    padding: 0.3rem 0.6rem;
+    border-radius: 0.5rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+
+  .arxiv {
+    background-color: #1e3a8a;
+    color: white;
+  }
+
+  .tandf{
+    background-color: #b45309;
+    color: white;
+  }
+
+  .rie{
+    background-color: #7c2d12;
+    color: white;
+  }
+
+  .mdpi{
+    background-color: #374151;
+    color: white;
+  }
+
+  .tag-default {
+    background-color: #6b7280;
+    color: white;
+  }
+
+  .keyword-neutral {
+    background-color: #eee;
+    color: #333;
+  }
+</style>
+
+<ul class="tags">
+  {
+    formatKeywords(sourcename, keywords).map((keyword, index) => {
+      const isFirst = index === 0;
+      const extraClass = isFirst
+        ? getFirstTagClass(sourcename)
+        : "keyword-neutral";
+
+      return (
+        <li class={`keyword ${extraClass}`} key={index}>
+          {keyword}
+        </li>
+      );
+    })
+  }
+</ul>

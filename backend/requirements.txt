@@ -3,3 +3,5 @@ beautifulsoup4
 python-dotenv
 psycopg2-binary
 selectolax
+feedparser
+selenium

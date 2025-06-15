@@ -1,78 +1,97 @@
-import requests 
+from selenium import webdriver
+from selenium.webdriver.firefox.options import Options
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from bs4 import BeautifulSoup
-from datetime import datetime
-from urllib.parse import urljoin
+import time
+import requests
 
-BASE_URL = "https://www.tandfonline.com"
-SOURCE_NAME = "TANDF"
+SOURCE_NAME = "Taylor & Francis"
 
-# Cabeceras para simular navegador real
-HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
-    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
-    "Accept-Language": "en-US,en;q=0.9",
-    "Referer": "https://www.google.com/",
-    "Connection": "keep-alive"
-}
+def init_firefox_driver():
+    options = Options()
+    options.headless = False  # Muy importante para correr sin interfaz gráfica
+    return webdriver.Firefox(options=options)
 
-def Scrape_tandf(url: str):
-    response = requests.get(url, headers=HEADERS)
-    if response.status_code != 200:
-        print(f"Error al obtener página principal: {response.status_code}")
-        return []
 
-    soup = BeautifulSoup(response.content, "html.parser")
+def getAbstract(doi):
+    url = f"https://www.tandfonline.com/pb/widgets/ajax/graphql/abstracts?type=abstract&doi={doi}&pbContext=;subPage:string:Topic Landing Page;taxonomy:taxonomy:allsubjects;topic:topic:allsubjects>cm;page:string:Search Result;wgroup:string:Publication Websites;pageGroup:string:Search Flow;website:website:TFOPB&widgetId=7e3f7864-5ba2-489e-8645-be774ad94f6b"
+    driver = init_firefox_driver()
+    driver.get(url)
+    try:
+        # Espera a que el abstract se cargue
+        WebDriverWait(driver, 4).until(
+            EC.presence_of_element_located((By.CLASS_NAME, "abstractSection"))
+        )
+        abstract_div = driver.find_element(By.CLASS_NAME, "abstractSection")
+        abstract = abstract_div.text.strip()
+    except Exception as e:
+        print("No se pudo obtener el abstract:", e)
+        abstract = ""
+    driver.quit()
+    return abstract
+
+def scrape_tandf(journal_url):
+    driver = init_firefox_driver()
+    driver.get(journal_url)
+    time.sleep(5)
+
+    articles = driver.find_elements(By.CSS_SELECTOR, 'article.searchResultItem')[:8]
     posts = []
 
-    articles = soup.find_all("div", class_="articleEntry")
     for article in articles:
         try:
-            title_div = article.find("div", class_="art_title")
-            if not title_div:
-                continue
+            soup = BeautifulSoup(article.get_attribute('outerHTML'), 'html.parser')
 
-            link_tag = title_div.find("a", href=True)
-            if not link_tag:
-                continue
+            # Título y URL
+            title_tag = soup.find('div', class_='art_title').find('a', class_='ref nowrap')
+            title = title_tag.get_text(strip=True)
+            url = "https://www.tandfonline.com" + title_tag['href']
 
-            title = link_tag.get_text(strip=True)
-            href = link_tag["href"]
-            full_url = urljoin(BASE_URL, href)
+            # Autores
+            authors_tag = soup.find('div', class_='author')
+            authors_text = authors_tag.get_text(strip=True) if authors_tag else ""
 
-            # Extraer abstract desde la página del artículo
-            abstract = get_abstract(full_url)
 
-            post = {
-                "title": title,
-                "summary": abstract[:200] + "...",
-                "content": abstract,
-                "url": full_url,
-                "type": "paper",
-                "published_at": datetime.now(),
-                "sourcename": SOURCE_NAME
-            }
+            # Fecha de publicación
+            pub_metas = soup.find_all('div', class_='publication-meta')
+            published_at = ""
+            summary = ""
+            if len(pub_metas) >= 2:
+                published_at = pub_metas[1].get_text(strip=True)
+            #Tags
+                summary = pub_metas[0].get_text(strip=True)
 
-            posts.append(post)
+            # DOI
+            doi = url.split("/doi/full/")[1] if "/doi/full/" in url else ""
+
+            content = getAbstract(doi)
 
         except Exception as e:
-            print(f"❌ Error procesando artículo: {e}")
+            print(f"Error procesando artículo: {e}")
             continue
 
+        post = {
+            'title': title,
+            'summary': summary,
+            'content': content,
+            'url': url,
+            'type': "paper",
+            'published_at': published_at,
+            'sourcename': SOURCE_NAME,
+            'downloadArticleLink': url,
+            'authors': authors_text,
+        }
+        posts.append(post)
+
+    driver.quit()
     return posts
 
+if __name__ == "__main__":
+# Ejemplo de uso
+    journal_url = "https://www.tandfonline.com/subjects/computer-science?startPage=&target=default&content=standard"
+    posts = scrape_tandf(journal_url)
 
-def get_abstract(article_url):
-    response = requests.get(article_url, headers=HEADERS)
-    if response.status_code != 200:
-        print(f"❌ Error al acceder al artículo: {article_url}")
-        return "Resumen no disponible"
-
-    soup = BeautifulSoup(response.content, "html.parser")
-
-    # Buscar el div con clase hlFld-Abstract y su párrafo
-    abstract_div = soup.find("div", class_="hlFld-Abstract")
-    if not abstract_div:
-        return "Resumen no disponible"
-
-    paragraph = abstract_div.find("p")
-    return paragraph.get_text(strip=True) if paragraph else "Resumen no disponible"
+    for post in posts:
+        print(post)

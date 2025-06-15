@@ -6,6 +6,8 @@ from scraping.arxiv import Scrape_arxiv
 from scraping.devto import Scrape_dev_to
 from scraping.rieoei import Scrape_rieoei
 from scraping.mdpi import Scrape_mdpi
+from scraping.tandf import scrape_tandf
+from scraping.scielo import scrape_scielo
 
 # Cargar las variables de entorno
 load_dotenv()
@@ -98,6 +100,10 @@ def scrape_source(source_name, source_url):
         return Scrape_rieoei(source_url)
     if source_name.lower() == 'mdpi':
         return Scrape_mdpi(source_url)
+    if source_name.lower() == 'taylor & francis':
+        return scrape_tandf(source_url)
+    if source_name.lower() == 'scielo':
+        return scrape_scielo(source_url)
     else:
         print(f"No hay scraper configurado para {source_name.lower()} ")
         return []

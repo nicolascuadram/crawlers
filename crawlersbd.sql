@@ -30,9 +30,14 @@ CREATE TABLE IF NOT EXISTS post (
   sourcename text
 );
 
-INSERT INTO source (id, name, url, type, active, created_at) VALUES (1, 'ArXiv CS', 'https://arxiv.org/list/cs/recent', 'paper', true, CURRENT_TIMESTAMP);
+INSERT INTO source (id, name, url, type, active, created_at) VALUES (1, 'ArXiv CS', 'https://arxiv.org/list/cs/recent', 'article', true, CURRENT_TIMESTAMP);
 
 
-INSERT INTO source (id, name, url, type, active, created_at) VALUES (2, 'Revista Iberoamericana de Educación', 'https://rieoei.org/RIE/issue/archive', 'paper', true, CURRENT_TIMESTAMP);
+INSERT INTO source (id, name, url, type, active, created_at) VALUES (2, 'Revista Iberoamericana de Educación', 'https://rieoei.org/RIE/issue/archive', 'article', true, CURRENT_TIMESTAMP);
 
-INSERT INTO source (id, name, url, type, active, created_at) VALUES (3, 'MDPI', 'https://www.mdpi.com/search?sort=pubdate&page_count=100&view=default', 'paper', true, CURRENT_TIMESTAMP);
+INSERT INTO source (id, name, url, type, active, created_at) VALUES (3, 'MDPI', 'https://www.mdpi.com/rss?sort=pubdate&page_count=100&view=default', 'article', true, CURRENT_TIMESTAMP);
+INSERT INTO source (id, name, url, type, active, created_at) VALUES (4, 'Taylor & Francis', 'https://www.tandfonline.com/subjects/computer-science?startPage=&target=default&content=standard', 'article', true, CURRENT_TIMESTAMP);
+
+
+INSERT INTO source (id, name, url, type, active, created_at) VALUES (5, 'Scielo', 'https://www.scielo.cl/scielo.php?script=sci_issuetoc&pid=0718-500620250002&lng=es&nrm=iso', 'article', true, CURRENT_TIMESTAMP);
+
