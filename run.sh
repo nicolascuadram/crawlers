@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Ruta absoluta al proyecto ()
-PROJECT_DIR="~/crawlers"
+PROJECT_DIR="/home/urzua_fernando_f/crawlers"
 BACKEND_DIR="$PROJECT_DIR/backend"
 VENV_DIR="$BACKEND_DIR/venv"
 
