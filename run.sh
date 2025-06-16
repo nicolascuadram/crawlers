@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Ruta absoluta al proyecto ()
-PROJECT_DIR="/home/urzua_fernando_f/crawlers"
+PROJECT_DIR="/home/furzua/utalca/gpt/crawlers"
 BACKEND_DIR="$PROJECT_DIR/backend"
 VENV_DIR="$BACKEND_DIR/venv"
 
@@ -9,18 +9,18 @@ VENV_DIR="$BACKEND_DIR/venv"
 cd "$PROJECT_DIR"
 
 # Activar entorno virtual
-if [ ! -d "$VENV_DIR" ]; then
-    echo "⚙️  Creando entorno virtual en $VENV_DIR..."
-    python3 -m venv "$VENV_DIR"
-fi
+#if [ ! -d "$VENV_DIR" ]; then
+#    echo "⚙️  Creando entorno virtual en $VENV_DIR..."
+#    python3 -m venv "$VENV_DIR"
+#fi
 
-echo "✅ Activando entorno virtual..."
-source "$VENV_DIR/bin/activate"
+#echo "✅ Activando entorno virtual..."
+#source "$VENV_DIR/bin/activate"
 
 # Instalar dependencias si es necesario
 #echo "📦 Instalando dependencias..."
 #pip install --upgrade pip
-#pip install -r "$PROJECT_DIR/backend/requirements.txt"
+pip install -r "$PROJECT_DIR/backend/requirements.txt"
 
 echo "🚀 Ejecutando crawler..."
 python3 "$PROJECT_DIR/backend/crawler.py"

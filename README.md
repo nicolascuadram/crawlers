@@ -17,9 +17,10 @@ Este sistema permite la integración de nuevas fuentes de artículos académicos
 ### Paso 1: Agregar la fuente a la base de datos
 
 Ejecuta un INSERT INTO en la tabla source para registrar la nueva fuente:
-
+```sql
 INSERT INTO source (id, name, url, type, active, created_at) 
 VALUES (6, 'Nombre de la nueva fuente', 'https://url-de-la-fuente.com', 'article', true, CURRENT_TIMESTAMP);
+```
 
     - id: Valor único.
 
