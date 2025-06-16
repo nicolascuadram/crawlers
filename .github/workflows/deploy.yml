@@ -22,6 +22,7 @@ jobs:
         with:
           path: ./frontend
           node-version: 22
+          package-manager: npm@latest
 
   deploy:
     needs: build
