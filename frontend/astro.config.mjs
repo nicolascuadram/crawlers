@@ -9,6 +9,7 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineConfig({
   base: "/crawlers/",
   outDir: "../dist",
+  site: 'https://nicolascuadram.github.io/crawlers/',
   integrations: [mdx(), sitemap()],
 
   vite: {
