@@ -10,7 +10,9 @@ export default defineConfig({
   site: 'https://nicolascuadram.github.io',
   base: "/crawlers",
   integrations: [mdx(), sitemap()],
-
+  server:{
+    host:true
+  },
   vite: {
     plugins: [tailwindcss()],
   },

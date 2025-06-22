@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: crawlers
+      POSTGRES_USER: furzua
+      POSTGRES_PASSWORD: slash
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - ./db/crawlersbd.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    networks:
+      - internal
+
+  backend:
+    build: ./backend
+    env_file:
+      - ./backend/.env
+    volumes:
+      - ./frontend/src/content/blog:/app/content  # para que writer.py pueda escribir ahí
+    depends_on:
+      - db
+    networks:
+      - internal
+      
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "8888:4321"
+    volumes:
+      - ./frontend:/app
+    depends_on:
+      - backend
+    networks:
+      - internal
+
+volumes:
+  db-data:
+
+networks:
+  internal:

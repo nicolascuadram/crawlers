@@ -38,7 +38,7 @@ cur.execute(
 )
 rows = cur.fetchall()
 
-output_dir = "../frontend/src/content/blog"
+output_dir = "/app/content"
 os.makedirs(output_dir, exist_ok=True)
 
 for row in rows:

@@ -1,0 +1,47 @@
+FROM python:3.11-slim
+
+RUN apt-get update && apt-get install -y cron
+
+# Librerias necesarias para usar el driver headless de firefox
+RUN apt-get update && apt-get install -y \
+    wget \
+    gnupg \
+    curl \
+    unzip \
+    xvfb \
+    firefox-esr \
+    fonts-liberation \
+    libgtk-3-0 \
+    libdbus-glib-1-2 \
+    libasound2 \
+    libnss3 \
+    libxss1 \
+    libxtst6 \
+    libx11-xcb1 \
+    libxcomposite1 \
+    libxdamage1 \
+    libxrandr2 \
+    libgbm1 \
+    libgl1 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Instalar geckodriver manualmente
+
+RUN wget -q "https://github.com/mozilla/geckodriver/releases/download/v0.36.0/geckodriver-v0.36.0-linux64.tar.gz" && \
+    tar -xzf geckodriver-v0.36.0-linux64.tar.gz -C /usr/local/bin && \
+    chmod +x /usr/local/bin/geckodriver && \
+    rm geckodriver-v0.36.0-linux64.tar.gz
+
+WORKDIR /app
+
+
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+COPY entrypoint.sh /entrypoint.sh
+
+RUN chmod +x /entrypoint.sh
+
+CMD ["/entrypoint.sh"]
