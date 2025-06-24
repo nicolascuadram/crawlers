@@ -1,5 +1,4 @@
-# crawlers
-Sistema Unificado de Extracción de Información para el Curso de Gestión de Proyectos Tecnológicos.
+# Sistema Unificado de Extracción de Información para el Curso de Gestión de Proyectos Tecnológicos.
 
 # 📄 Documentación técnica: Agregar una nueva fuente de scraping
 
