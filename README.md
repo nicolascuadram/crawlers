@@ -1,10 +1,91 @@
 # Sistema Unificado de Extracción de Información para el Curso de Gestión de Proyectos Tecnológicos.
 
-# 📄 Documentación técnica: Agregar una nueva fuente de scraping
+## Instalación del sistema
+
+### Requisitos
+
+- node
+- python
+- npm
+- pip
+- postgreSQL
+
+### Paso 1: Clonar el repositorio
+
+`git clone https://github.com/nicolascuadram/crawlers.git`
+
+
+### Paso 2: Instalación de dependencias
+Una vez descargado el código fuente debemos instalar las librerias necesarias para ejecutar el sistema
+
+#### Backend
+Ingresamos a la carpeta contenedora del backend e instalamos las dependencias mendiante `pip`
+
+`pip install -r requirements.txt`
+
+#### Frontend
+Ingresamos a la carpeta contenedora del frontend e instalamos las dependencias mediante `npm`
+
+`npm install`
+
+### Paso 3: Ejecución
+
+#### Frontend
+Dentro de la carpeta contenedora del frontend se debe iniciar el servicio con el comando `npm run dev`, esto levantará el servicio en el puerto por defecto 4321, que permitirá acceder a los posts guardados en la aplicación, dichos posts se encuentran en la carpeta src/content/blog y siguen un formato en especifico.
+
+#### Backend
+Para la correcta ejecución del backend se necesita un archivo llamado `.env` ubicado en la carpeta contenedora, es decir, en: `backend/.env`
+dicho archivo debe contener los siguientes datos de configuración de el SGBD postgreSQL:
+```conf
+DB_NAME=nombrebd
+DB_USER=usuariobd
+DB_PASSWORD=passwordbd
+DB_HOST=hostbd
+DB_PORT=puertobd
+```
+
+#### Base de datos
+Se debe crear una base de datos en postgreSQL, esta debe inicializarse con la estructura ubicada en `db/crawlersbd.sql`
+
+#### Scraping
+
+El backend cuenta con 2 scripts de python, los cuales manejan la lógica de la aplicación
+
+- `crawler.py` se encarga de ejecutar el scraping, extrayendo la información de todas las fuentes y guardandolas en la base de datos.
+- `writer.py` toma la información de la base de datos y la escribe en archivos .md, los cuales se renderizarán posteriormente en el frontend
+
+Por lo tanto para agregar nuevas fuentes deben correrse secuencialmente ambos archivos.
+
+En entornos linux se puede hacer uso del script `backend/entrypoint.sh` el cual ejecutará programará ambos scripts para correr automaticamente cada 4 horas.
+
+##### Importante
+
+Se debe modificar el archivo `writer.py` para guardar los archivos en la ruta correcta, por defecto está seteado a
+
+```python
+output_dir = "/app/content"
+```
+
+este valor funciona para la aplicación dockerizada, en caso de querer leventarla en local, se debe modificar a la carpeta donde se guardarán los posts, que en la mayoria de los casos seria:
+
+```python
+output_dir = "../frontend/src/content/blog"
+```
+
+#### Docker
+
+Para la ejecución de la aplicación dockerizada, basta con comprobar que el archivo .env ubicado en el backend, coincida con las credenciales de bases de datos definidas en el docker-compose.
+Con ese requisito completo basta con desplegarla utilizando:
+
+```bash
+sudo docker compose up --build
+```
+
+## Agregar una nueva fuente de scraping
 
 Este sistema permite la integración de nuevas fuentes de artículos académicos o técnicos mediante scrapers personalizados. La arquitectura está diseñada para ser modular y extensible.
 
-## 🧱 Estructura del sistema
+### 🧱 Estructura del sistema
 
     backend/scraping/: Carpeta que contiene los scrapers individuales por fuente.
 
@@ -12,8 +93,8 @@ Este sistema permite la integración de nuevas fuentes de artículos académicos
 
     Base de datos PostgreSQL con las tablas: source, post, log.
 
-## ✅ Requisitos para agregar una nueva fuente
-### Paso 1: Agregar la fuente a la base de datos
+### ✅ Requisitos para agregar una nueva fuente
+#### Paso 1: Agregar la fuente a la base de datos
 
 Ejecuta un INSERT INTO en la tabla source para registrar la nueva fuente:
 ```sql
@@ -33,7 +114,7 @@ VALUES (6, 'Nombre de la nueva fuente', 'https://url-de-la-fuente.com', 'article
 
     - created_at: CURRENT_TIMESTAMP.
 
-### Paso 2: Crear el scraper
+#### Paso 2: Crear el scraper
 
 Dentro del directorio backend/scraping/, crea un nuevo archivo, por ejemplo:
 
@@ -84,13 +165,13 @@ post = {
 
 ```
 
-### Paso 3: Importar el scraper
+#### Paso 3: Importar el scraper
 
 Ve al archivo principal de scraping (crawler.py) y agrega la importación:
 
 `from scraping.nueva_fuente import scrape_nueva_fuente`
 
-### Paso 4: Agregarlo al router de scrapers
+#### Paso 4: Agregarlo al router de scrapers
 
 Dentro de la función `scrape_source`, añade el if correspondiente usando el nombre registrado en la base de datos:
 ```python
@@ -100,7 +181,7 @@ if source_name.lower() == 'nombre de la nueva fuente':
 
 Asegúrate de que el texto de comparación (source_name.lower()) coincida exactamente con el campo name en la base de datos en minúsculas.
 
-#### 📦 Formato esperado de cada post
+##### 📦 Formato esperado de cada post
 
 Cada scraper debe devolver una lista de diccionarios con la siguiente estructura:
 
