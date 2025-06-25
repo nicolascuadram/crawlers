@@ -1,6 +1,6 @@
-# Sistema Unificado de Extracción de Información para el Curso de Gestión de Proyectos Tecnológicos.
+# Sistema Unificado de Extracción de Información para el Curso de Gestión de Proyectos Tecnológicos
 
-## Instalación del sistema
+## Instalación del sistema en local
 
 ### Requisitos
 
@@ -14,16 +14,18 @@
 
 `git clone https://github.com/nicolascuadram/crawlers.git`
 
-
 ### Paso 2: Instalación de dependencias
+
 Una vez descargado el código fuente debemos instalar las librerias necesarias para ejecutar el sistema
 
 #### Backend
+
 Ingresamos a la carpeta contenedora del backend e instalamos las dependencias mendiante `pip`
 
 `pip install -r requirements.txt`
 
 #### Frontend
+
 Ingresamos a la carpeta contenedora del frontend e instalamos las dependencias mediante `npm`
 
 `npm install`
@@ -31,11 +33,14 @@ Ingresamos a la carpeta contenedora del frontend e instalamos las dependencias m
 ### Paso 3: Ejecución
 
 #### Frontend
+
 Dentro de la carpeta contenedora del frontend se debe iniciar el servicio con el comando `npm run dev`, esto levantará el servicio en el puerto por defecto 4321, que permitirá acceder a los posts guardados en la aplicación, dichos posts se encuentran en la carpeta src/content/blog y siguen un formato en especifico.
 
 #### Backend
+
 Para la correcta ejecución del backend se necesita un archivo llamado `.env` ubicado en la carpeta contenedora, es decir, en: `backend/.env`
 dicho archivo debe contener los siguientes datos de configuración de el SGBD postgreSQL:
+
 ```conf
 DB_NAME=nombrebd
 DB_USER=usuariobd
@@ -45,6 +50,7 @@ DB_PORT=puertobd
 ```
 
 #### Base de datos
+
 Se debe crear una base de datos en postgreSQL, esta debe inicializarse con la estructura ubicada en `db/crawlersbd.sql`
 
 #### Scraping
@@ -72,14 +78,30 @@ este valor funciona para la aplicación dockerizada, en caso de querer leventarl
 output_dir = "../frontend/src/content/blog"
 ```
 
-#### Docker
+## Instalación Dockerizada
 
-Para la ejecución de la aplicación dockerizada, basta con comprobar que el archivo .env ubicado en el backend, coincida con las credenciales de bases de datos definidas en el docker-compose.
-Con ese requisito completo basta con desplegarla utilizando:
+Para la ejecución de la aplicación dockerizada, basta con comprobar que el archivo .env ubicado en el backend, coincida con las credenciales de bases de datos definidas en el docker-compose, este archivo debe tener la siguiente estructura (reemplazar con los valores reales)
+
+````conf
+DB_NAME=crawlers
+DB_USER=furzua
+DB_PASSWORD=1234
+DB_HOST=dbcrawl
+DB_PORT=5432
+```
+
+Posteriormente se deben instalar las dependencias en la carpeta del frontend 
+
+```bash
+cd frontend && npm i && cd ..
+```
+
+Finalmente, se puede desplegar la aplicación con el comando
 
 ```bash
 sudo docker compose up --build
-```
+````
+
 
 ## Agregar una nueva fuente de scraping
 
@@ -94,11 +116,13 @@ Este sistema permite la integración de nuevas fuentes de artículos académicos
     Base de datos PostgreSQL con las tablas: source, post, log.
 
 ### ✅ Requisitos para agregar una nueva fuente
+
 #### Paso 1: Agregar la fuente a la base de datos
 
 Ejecuta un INSERT INTO en la tabla source para registrar la nueva fuente:
+
 ```sql
-INSERT INTO source (id, name, url, type, active, created_at) 
+INSERT INTO source (id, name, url, type, active, created_at)
 VALUES (6, 'Nombre de la nueva fuente', 'https://url-de-la-fuente.com', 'article', true, CURRENT_TIMESTAMP);
 ```
 
@@ -108,7 +132,7 @@ VALUES (6, 'Nombre de la nueva fuente', 'https://url-de-la-fuente.com', 'article
 
     - url: URL de origen para scrapear.
 
-    - type: Tipo de contenido de la fuente, por ejemplo, articulos. 
+    - type: Tipo de contenido de la fuente, por ejemplo, articulos.
 
     - active: true para que se ejecute.
 
@@ -150,6 +174,7 @@ def scrape_nueva_fuente(base_url):
 ```
 
 La lógica o librerias a usar en el scraping pueden variar para cada fuente, pero es necesario que la función usada para scrapear, reciba como argumento solo la url objetivo y retorne un arreglo de objetos con la siguiente estructura:
+
 ```python
 post = {
             'title': string, # titulo de los articulos
@@ -174,6 +199,7 @@ Ve al archivo principal de scraping (crawler.py) y agrega la importación:
 #### Paso 4: Agregarlo al router de scrapers
 
 Dentro de la función `scrape_source`, añade el if correspondiente usando el nombre registrado en la base de datos:
+
 ```python
 if source_name.lower() == 'nombre de la nueva fuente':
     return scrape_nueva_fuente(source_url)
@@ -199,11 +225,7 @@ post = {
 }
 ```
 
-🧪 Recomendaciones
-    - Valida la existencia de campos antes de extraerlos para evitar errores (NoneType).
-    - Loguea errores si una página no contiene lo esperado.
-    - Testea manualmente el scraper antes de habilitarlo en producción.
-    - Usa try/except dentro del scraper si es una fuente inconsistente.
+🧪 Recomendaciones - Valida la existencia de campos antes de extraerlos para evitar errores (NoneType). - Loguea errores si una página no contiene lo esperado. - Testea manualmente el scraper antes de habilitarlo en producción. - Usa try/except dentro del scraper si es una fuente inconsistente.
 
 🧹 Opcional: desactivar temporalmente una fuente
 
