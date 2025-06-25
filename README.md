@@ -82,7 +82,7 @@ output_dir = "../frontend/src/content/blog"
 
 Para la ejecución de la aplicación dockerizada, basta con comprobar que el archivo .env ubicado en el backend, coincida con las credenciales de bases de datos definidas en el docker-compose, este archivo debe tener la siguiente estructura (reemplazar con los valores reales)
 
-````conf
+```conf
 DB_NAME=crawlers
 DB_USER=furzua
 DB_PASSWORD=1234
@@ -101,7 +101,6 @@ Finalmente, se puede desplegar la aplicación con el comando
 ```bash
 sudo docker compose up --build
 ````
-
 
 ## Agregar una nueva fuente de scraping
 
