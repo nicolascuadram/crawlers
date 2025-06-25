@@ -6,7 +6,7 @@ services:
     environment:
       POSTGRES_DB: crawlers
       POSTGRES_USER: furzua
-      POSTGRES_PASSWORD: slash
+      POSTGRES_PASSWORD: 1234
     volumes:
       - db-data:/var/lib/postgresql/data
       - ./db/crawlersbd.sql:/docker-entrypoint-initdb.d/init.sql:ro
