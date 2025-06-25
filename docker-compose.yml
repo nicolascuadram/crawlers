@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  db:
+  dbcrawl:
     image: postgres:15
     environment:
       POSTGRES_DB: crawlers
@@ -13,26 +13,26 @@ services:
     networks:
       - internal
 
-  backend:
+  backendcrawl:
     build: ./backend
     env_file:
       - ./backend/.env
     volumes:
       - ./frontend/src/content/blog:/app/content  # para que writer.py pueda escribir ahí
     depends_on:
-      - db
+      - dbcrawl
     networks:
       - internal
       
 
-  frontend:
+  frontendcrawl:
     build: ./frontend
     ports:
       - "8888:4321"
     volumes:
       - ./frontend:/app
     depends_on:
-      - backend
+      - backendcrawl
     networks:
       - internal
 
